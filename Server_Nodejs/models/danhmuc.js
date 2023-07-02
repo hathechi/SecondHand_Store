@@ -10,6 +10,10 @@ const DanhMuc = mydb.define('danhmuc', {
     ten_danhmuc: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    status: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false
     }
 }, {
     tableName: 'danhmuc',

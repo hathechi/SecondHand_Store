@@ -10,6 +10,5 @@ router.post('/api/sanpham', sanpham_controller.insertData)
 router.put('/api/sanpham', sanpham_controller.updateData)
 router.delete('/api/sanpham', sanpham_controller.deleteData)
 
-//Router Danh Mục
 
 export default router;

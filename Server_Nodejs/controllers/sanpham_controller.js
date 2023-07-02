@@ -169,7 +169,6 @@ const searchByID = async (id) => {
 //insert data 
 const insertData = async (req, res) => {
     try {
-
         const insert = await SanPham.create({
             ten_sanpham: req.body.ten_sanpham,
             id_nguoidung: req.body.id_nguoidung,

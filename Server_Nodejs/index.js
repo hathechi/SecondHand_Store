@@ -16,10 +16,6 @@ try {
 } catch (error) {
     console.error('Unable to connect to the database:', error);
 }
-// mydb.connect(function (err) {
-//     if (err) throw err;
-//     console.log(`Connected ${process.env.DB_NAME_MYSQL}!`);
-// });
 
 //-----------------------------------------------------------------
 
@@ -27,7 +23,9 @@ try {
 //Sản Phẩm
 import sanPham_router from './routers/sanpham_router.js'
 app.use(sanPham_router);
-
+//Danh Mục
+import danhMuc_router from './routers/danhmuc_router.js'
+app.use(danhMuc_router);
 //-----------------------------------------------------------------
 
 // Middleware để xử lý yêu cầu không tìm thấy (404)
