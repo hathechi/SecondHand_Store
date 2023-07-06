@@ -19,7 +19,6 @@ try {
 
 //-----------------------------------------------------------------
 
-
 //Sản Phẩm
 import sanPham_router from './routers/sanpham_router.js'
 app.use(sanPham_router);
