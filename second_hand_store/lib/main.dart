@@ -1,4 +1,6 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:second_hand_store/provider/google_signin.dart';
 import 'package:second_hand_store/screens/splash_screen.dart';
@@ -21,9 +23,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ChangeNotifierProvider(
         create: (context) => GoogleSignInProvider(),
-        child: const MaterialApp(
+        child: MaterialApp(
+          theme: ThemeData(
+            fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
+          ),
+          builder: BotToastInit(), //1. call BotToastInit
+          navigatorObservers: [BotToastNavigatorObserver()],
           debugShowCheckedModeBanner: false,
-          home: SplashScreen(),
+          home: const SplashScreen(),
         ),
       );
 }

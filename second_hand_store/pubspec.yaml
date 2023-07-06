@@ -45,6 +45,10 @@ dependencies:
   font_awesome_flutter: ^10.5.0
   #font 
   google_fonts: ^5.1.0
+  #toast
+  bot_toast: ^4.0.4
+  #auto scroll
+  carousel_slider: ^4.2.1
 
 dev_dependencies:
   flutter_test:

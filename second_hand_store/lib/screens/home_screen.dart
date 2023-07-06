@@ -1,16 +1,12 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
-import 'package:provider/provider.dart';
-import 'package:second_hand_store/screens/login_screen.dart';
 import 'package:second_hand_store/screens/pages/feed_page.dart';
 import 'package:second_hand_store/screens/pages/home_page.dart';
 import 'package:second_hand_store/screens/pages/profile_page.dart';
 import 'package:second_hand_store/screens/pages/search_page.dart';
 import 'package:second_hand_store/utils/colors.dart';
-import '../provider/google_signin.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,8 +25,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<PersistentBottomNavBarItem> _navBarsItems() {
     return [
       PersistentBottomNavBarItem(
-        icon: const Icon(CupertinoIcons.house),
-        iconSize: 26,
+        icon: const Icon(CupertinoIcons.house_alt),
+        iconSize: 30,
         title: ("Pik"),
         activeColorPrimary: activeColorPrimary,
         inactiveColorPrimary: inactiveColorPrimary,
@@ -50,8 +46,8 @@ class _HomeScreenState extends State<HomeScreen> {
         inactiveColorPrimary: inactiveColorPrimary,
       ),
       PersistentBottomNavBarItem(
-        icon: const Icon(FontAwesomeIcons.userAstronaut),
-        iconSize: 24,
+        icon: const Icon(CupertinoIcons.person),
+        iconSize: 30,
         title: ("Tôi"),
         activeColorPrimary: activeColorPrimary,
         inactiveColorPrimary: inactiveColorPrimary,
