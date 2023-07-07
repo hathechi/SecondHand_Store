@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:second_hand_store/provider/google_signin.dart';
-import 'package:second_hand_store/screens/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:second_hand_store/screens/splash_screen.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -13,6 +13,7 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   runApp(const MyApp());
 }
 
@@ -30,7 +31,21 @@ class MyApp extends StatelessWidget {
           builder: BotToastInit(), //1. call BotToastInit
           navigatorObservers: [BotToastNavigatorObserver()],
           debugShowCheckedModeBanner: false,
-          home: const SplashScreen(),
+          home: Stack(alignment: Alignment.center, children: [
+            const SplashScreen(),
+            Builder(builder: (context) {
+              final myProvider =
+                  Provider.of<GoogleSignInProvider>(context, listen: true);
+              return myProvider.isLoading
+                  ? Container(
+                      color: Colors.transparent,
+                      child: const CircularProgressIndicator(
+                        color: Colors.blue,
+                      ),
+                    )
+                  : const SizedBox();
+            })
+          ]),
         ),
       );
 }

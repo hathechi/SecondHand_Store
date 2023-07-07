@@ -12,9 +12,9 @@ class _FeedPageState extends State<FeedPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-          height: MediaQuery.of(context).size.height,
+          height: double.infinity,
           color: Colors.orange,
-          child: Center(
+          child: const Center(
             child: Text("Feed Page"),
           )),
     );

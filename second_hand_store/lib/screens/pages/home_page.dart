@@ -24,6 +24,7 @@ class _HomePageState extends State<HomePage> {
     "https://img.freepik.com/free-vector/flash-sale-discount-banner-design-vector-illustration_1017-38420.jpg?w=2000",
     "https://img.freepik.com/premium-psd/big-sale-modern-banner-promotional-template_501916-457.jpg?w=2000"
   ];
+
   List<Category> category = [
     Category(
         urlImage:
@@ -173,7 +174,7 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 Stack(
                                   children: [
-                                    Container(
+                                    SizedBox(
                                       width: MediaQuery.of(context).size.width *
                                           0.6,
                                       height:
@@ -199,18 +200,17 @@ class _HomePageState extends State<HomePage> {
                                             bottomLeft: Radius.circular(10),
                                           ),
                                         ),
-                                        child: Text(
+                                        child: const Text(
                                           "Hơi nát",
-                                          style: const TextStyle(
-                                              color: Colors.white),
+                                          style: TextStyle(color: Colors.white),
                                         ),
                                       ),
                                     ),
                                   ],
                                 ),
                                 Container(
-                                  margin: EdgeInsets.only(top: 8),
-                                  child: Text(
+                                  margin: const EdgeInsets.only(top: 8),
+                                  child: const Text(
                                     "120.000đ",
                                   ),
                                 ),
@@ -276,7 +276,7 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 Stack(
                                   children: [
-                                    Container(
+                                    SizedBox(
                                       width: MediaQuery.of(context).size.width *
                                           0.6,
                                       height:
@@ -312,8 +312,8 @@ class _HomePageState extends State<HomePage> {
                                   ],
                                 ),
                                 Container(
-                                  margin: EdgeInsets.only(top: 8),
-                                  child: Text(
+                                  margin: const EdgeInsets.only(top: 8),
+                                  child: const Text(
                                     "120.000đ",
                                   ),
                                 ),
@@ -363,20 +363,24 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 Stack(
                                   children: [
-                                    Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.6,
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.2,
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: Image.network(
-                                          category[index].urlImage,
-                                          fit: BoxFit.cover,
+                                    Builder(builder: (context) {
+                                      return SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.6,
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.2,
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: Image.network(
+                                            category[index].urlImage,
+                                            fit: BoxFit.cover,
+                                          ),
                                         ),
-                                      ),
-                                    ),
+                                      );
+                                    }),
                                     Positioned(
                                       bottom: 0,
                                       left: 0,
@@ -399,8 +403,8 @@ class _HomePageState extends State<HomePage> {
                                   ],
                                 ),
                                 Container(
-                                  margin: EdgeInsets.only(top: 8),
-                                  child: Text(
+                                  margin: const EdgeInsets.only(top: 8),
+                                  child: const Text(
                                     "120.000đ",
                                   ),
                                 ),
