@@ -1,12 +1,13 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:ffi';
-import 'dart:math';
 
-import 'package:carousel_slider/carousel_options.dart';
+import 'dart:developer';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:second_hand_store/provider/product_provider.dart';
 import 'package:second_hand_store/utils/colors.dart';
 import 'package:second_hand_store/utils/show_toast.dart';
 
@@ -18,6 +19,52 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  //controller khi scroll trang
+  final _scrollController = ScrollController();
+  //page đầu tiên bằng 1
+  int page = 1;
+  bool isLoadingMore = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      final provider = Provider.of<ProductProvider>(context, listen: false);
+      provider.getAllProduct(page);
+    });
+    //sử dụng _scrollController.addListener(() => scrollListener(context)); để lắng nghe sự kiện lần đầu ở initState
+    _scrollController.addListener(() => scrollListener(context));
+  }
+
+//Hàm xử lý khi cuộn tới cuối
+  Future<void> scrollListener(BuildContext context) async {
+//Khi đi đến cuối trang sẽ gọi hàm load page
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
+      final provider = Provider.of<ProductProvider>(context, listen: false);
+      // if (isLoadingMore) return;
+
+      page = page + 1;
+      if (page <= provider.totalPage) {
+        setState(() {
+          isLoadingMore = true;
+        });
+        await provider.getAllProduct(page);
+        log("Load Page: $page");
+
+        setState(() {
+          isLoadingMore = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollController as VoidCallback);
+    super.dispose();
+  }
+
   List listImageSale = [
     "https://previews.123rf.com/images/alhovik/alhovik1606/alhovik160600012/58062462-special-offer-super-sale-banner-design-template-big-super-sale-save-up-to-50.jpg",
     "https://c8.alamy.com/comp/2BTR1PF/sale-banner-template-design-super-sale-special-offer-poster-placard-web-banner-designs-vector-illustration-2BTR1PF.jpg",
@@ -113,6 +160,7 @@ class _HomePageState extends State<HomePage> {
         color: primaryColor,
         height: double.infinity,
         child: SingleChildScrollView(
+          controller: _scrollController,
           physics: const BouncingScrollPhysics(),
           child: Column(
             children: [
@@ -344,75 +392,95 @@ class _HomePageState extends State<HomePage> {
                     ),
                     Container(
                       margin: const EdgeInsets.symmetric(vertical: 10),
-
                       // height: MediaQuery.of(context).size.height * 0.28,
-                      child: GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisExtent: 250,
-                        ),
-                        itemCount: category.length,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            margin: const EdgeInsets.all(8),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Stack(
+                      child: Consumer<ProductProvider>(
+                          builder: (context, value, child) {
+                        return GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisExtent: 250,
+                          ),
+                          itemCount: isLoadingMore
+                              ? value.sanphams.length + 1
+                              : value.sanphams.length,
+                          itemBuilder: (context, index) {
+                            if (index < value.sanphams.length) {
+                              return Container(
+                                margin: const EdgeInsets.all(8),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Builder(builder: (context) {
-                                      return SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.6,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.2,
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          child: Image.network(
-                                            category[index].urlImage,
-                                            fit: BoxFit.cover,
+                                    Stack(
+                                      children: [
+                                        Builder(builder: (context) {
+                                          return SizedBox(
+                                            // width: MediaQuery.of(context)
+                                            //         .size
+                                            //         .width *
+                                            //     0.6,
+                                            // height: MediaQuery.of(context)
+                                            //         .size
+                                            //         .height *
+                                            //     0.2,
+                                            height: 200,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              child: Image.network(
+                                                value.sanphams[index]
+                                                        .imageArr![0] ??
+                                                    "https://cdn.24h.com.vn/upload/1-2022/images/2022-03-16/baukrysie_275278910_3174792849424333_1380029197326773703_n-1647427653-670-width1440height1800.jpg",
+                                                fit: BoxFit.cover,
+                                                width: double.infinity,
+                                                height: double.infinity,
+                                              ),
+                                            ),
+                                          );
+                                        }),
+                                        Positioned(
+                                          bottom: 0,
+                                          left: 0,
+                                          child: Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: const BoxDecoration(
+                                              color: Colors.black87,
+                                              borderRadius: BorderRadius.only(
+                                                topRight: Radius.circular(10),
+                                                bottomLeft: Radius.circular(10),
+                                              ),
+                                            ),
+                                            child: Text(
+                                              value.sanphams[index].danhmuc!,
+                                              style: const TextStyle(
+                                                  color: Colors.white),
+                                            ),
                                           ),
                                         ),
-                                      );
-                                    }),
-                                    Positioned(
-                                      bottom: 0,
-                                      left: 0,
-                                      child: Container(
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: const BoxDecoration(
-                                          color: Colors.black87,
-                                          borderRadius: BorderRadius.only(
-                                            topRight: Radius.circular(10),
-                                            bottomLeft: Radius.circular(10),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          category[index].title,
-                                          style: const TextStyle(
-                                              color: Colors.white),
-                                        ),
+                                      ],
+                                    ),
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 8),
+                                      child: Text(
+                                        value.sanphams[index].gia.toString(),
                                       ),
                                     ),
                                   ],
                                 ),
-                                Container(
-                                  margin: const EdgeInsets.only(top: 8),
-                                  child: const Text(
-                                    "120.000đ",
-                                  ),
+                              );
+                            } else {
+                              return const Align(
+                                alignment: Alignment.bottomCenter,
+                                child: CircularProgressIndicator(
+                                  color: Colors.red,
                                 ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
+                              );
+                            }
+                          },
+                        );
+                      }),
                     ),
                   ],
                 ),

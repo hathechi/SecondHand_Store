@@ -1,9 +1,11 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:second_hand_store/provider/google_signin.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:second_hand_store/provider/product_provider.dart';
 import 'package:second_hand_store/screens/splash_screen.dart';
 import 'firebase_options.dart';
 
@@ -13,7 +15,7 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -22,21 +24,40 @@ class MyApp extends StatelessWidget {
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) => ChangeNotifierProvider(
-        create: (context) => GoogleSignInProvider(),
-        child: MaterialApp(
+  Widget build(BuildContext context) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => GoogleSignInProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ProductProvider(),
+        ),
+
+        //Something
+      ],
+      builder: (context, child) {
+        final botToastBuilder = BotToastInit();
+        return MaterialApp(
+          builder: (context, child) {
+            child = botToastBuilder(context, child);
+            return child;
+          },
           theme: ThemeData(
+            brightness: Brightness.light,
             fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
           ),
-          builder: BotToastInit(), //1. call BotToastInit
           navigatorObservers: [BotToastNavigatorObserver()],
           debugShowCheckedModeBanner: false,
           home: Stack(alignment: Alignment.center, children: [
             const SplashScreen(),
             Builder(builder: (context) {
-              final myProvider =
+              final providerGoogle =
                   Provider.of<GoogleSignInProvider>(context, listen: true);
-              return myProvider.isLoading
+              final providerProduct =
+                  Provider.of<ProductProvider>(context, listen: true);
+
+              return providerGoogle.isLoading || providerProduct.isLoading
                   ? Container(
                       color: Colors.transparent,
                       child: const CircularProgressIndicator(
@@ -46,6 +67,8 @@ class MyApp extends StatelessWidget {
                   : const SizedBox();
             })
           ]),
-        ),
-      );
+        );
+      },
+    );
+  }
 }

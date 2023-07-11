@@ -138,10 +138,12 @@ const getPage = async (req, res) => {
             order: [['id_sanpham', 'DESC']]
         });
         if (dataAll != null) {
+            let sanphams = (await SanPham.findAll()).length;
+            let totalPage = Math.round(sanphams / limit);
             //dữ liệu trả về khi đã get ArrImage và loại bỏ key không mong muốn
             const modifiedData = await removeKey(dataAll);
             const arrImageProduct = await getArrImage(modifiedData);
-            res.status(200).json(arrImageProduct)
+            res.status(200).json({ "totalPage": totalPage, arrImageProduct })
         } else {
             res.status(404).json('NO DATA');
         }
@@ -164,6 +166,8 @@ const searchByID = async (id) => {
     } else {
         return false
     }
+
+
 }
 
 //insert data 
