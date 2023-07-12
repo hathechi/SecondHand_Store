@@ -11,7 +11,9 @@ class ProductProvider extends ChangeNotifier {
 
   Future<void> getAllProduct(int page) async {
     isLoading = true;
-
+    if (page == 1) {
+      _sanphams.clear();
+    }
     final response = await ProductService.fetchData(page);
     List<SanPham> itemProduct = [];
     totalPage = await response["totalPage"];
@@ -21,6 +23,7 @@ class ProductProvider extends ChangeNotifier {
             SanPham.fromJson(item),
           ),
         });
+
     _sanphams = _sanphams + itemProduct;
     isLoading = false;
     notifyListeners();

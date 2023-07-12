@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:provider/provider.dart';
+import 'package:second_hand_store/screens/detail_screen.dart';
 import 'package:second_hand_store/screens/pages/feed_page.dart';
 import 'package:second_hand_store/screens/pages/home_page.dart';
 import 'package:second_hand_store/screens/pages/login_page.dart';

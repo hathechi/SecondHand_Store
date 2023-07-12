@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:second_hand_store/provider/category_provider.dart';
 import 'package:second_hand_store/provider/google_signin.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:second_hand_store/provider/product_provider.dart';
-import 'package:second_hand_store/screens/splash_screen.dart';
+import 'package:second_hand_store/screens/detail_screen.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -33,6 +34,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => ProductProvider(),
         ),
+        ChangeNotifierProvider(
+          create: (context) => CategoryProvider(),
+        ),
 
         //Something
       ],
@@ -50,14 +54,20 @@ class MyApp extends StatelessWidget {
           navigatorObservers: [BotToastNavigatorObserver()],
           debugShowCheckedModeBanner: false,
           home: Stack(alignment: Alignment.center, children: [
-            const SplashScreen(),
+            // const SplashScreen(),
+            DetailScreen(),
+
             Builder(builder: (context) {
               final providerGoogle =
                   Provider.of<GoogleSignInProvider>(context, listen: true);
               final providerProduct =
                   Provider.of<ProductProvider>(context, listen: true);
+              final providerCategory =
+                  Provider.of<CategoryProvider>(context, listen: true);
 
-              return providerGoogle.isLoading || providerProduct.isLoading
+              return providerGoogle.isLoading ||
+                      providerProduct.isLoading ||
+                      providerCategory.isLoading
                   ? Container(
                       color: Colors.transparent,
                       child: const CircularProgressIndicator(
