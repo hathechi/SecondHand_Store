@@ -7,6 +7,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 class GoogleSignInProvider extends ChangeNotifier {
   final googleSignIn = GoogleSignIn();
+
+  User? user;
   bool isLogged = false;
   bool isLoading = false;
 
@@ -64,6 +66,7 @@ class GoogleSignInProvider extends ChangeNotifier {
       showLoading();
 
       await FirebaseAuth.instance.signInWithCredential(credential);
+      user = FirebaseAuth.instance.currentUser!;
       isLogged = true;
       dismiss();
 

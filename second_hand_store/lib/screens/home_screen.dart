@@ -2,15 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:provider/provider.dart';
-import 'package:second_hand_store/screens/detail_screen.dart';
 import 'package:second_hand_store/screens/pages/feed_page.dart';
-import 'package:second_hand_store/screens/pages/home_page.dart';
 import 'package:second_hand_store/screens/pages/login_page.dart';
 import 'package:second_hand_store/screens/pages/profile_page.dart';
 import 'package:second_hand_store/screens/pages/search_page.dart';
 import 'package:second_hand_store/utils/colors.dart';
 
 import '../provider/google_signin.dart';
+import 'add_product.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,13 +23,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Widget> _buildScreens(BuildContext context) {
     return [
-      const HomePage(),
+      const AddProduct(),
+      // const HomePage(),
       const SearchPage(),
       const FeedPage(),
       Builder(builder: (context) {
         final provider =
             Provider.of<GoogleSignInProvider>(context, listen: true);
-        return provider.isLogged ? const ProfilePage() : const LoginPage();
+        return provider.isLogged
+            ? ProfilePage(
+                controller: _controller,
+              )
+            : const LoginPage();
       })
     ];
   }
@@ -76,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async => true,
       child: Scaffold(
         body: PersistentTabView(
           context,
@@ -84,7 +88,8 @@ class _HomeScreenState extends State<HomeScreen> {
           screens: _buildScreens(context),
           items: _navBarsItems(),
           confineInSafeArea: true,
-          backgroundColor: secondaryColor, // Default is Colors.white.
+          backgroundColor: Colors.white, // Default is Colors.white.
+          // backgroundColor: secondaryColor, // Default is Colors.white.
           handleAndroidBackButtonPress: true, // Default is true.
           resizeToAvoidBottomInset:
               true, // This needs to be true if you want to move up the screen when keyboard appears. Default is true.
@@ -110,8 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
             duration: Duration(milliseconds: 200),
           ),
           navBarStyle: NavBarStyle
-              .style11, // Choose the nav bar style with this property.
-          // NavBarStyle.style11, // Choose the nav bar style with this property.
+              .style12, // Choose the nav bar style with this property.
         ),
       ),
     );

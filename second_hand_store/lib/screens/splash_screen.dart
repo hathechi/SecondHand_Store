@@ -26,9 +26,13 @@ class _SplashScreenState extends State<SplashScreen> {
             return const Center(
               child: CircularProgressIndicator(),
             );
+          } else if (snapshot.hasData) {
             //Nếu có thông tin đăng nhập thì chuyển sang màn home ngược lại thì về đăng nhập
+            provider.user = FirebaseAuth
+                .instance.currentUser!; //Lưu thông tin đăng nhập vào provider
+            provider.isLogged = snapshot.hasData;
           }
-          provider.isLogged = snapshot.hasData;
+
           return const HomeScreen();
         },
       ),

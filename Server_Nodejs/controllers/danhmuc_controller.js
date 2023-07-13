@@ -21,7 +21,7 @@ const getAllData = async (req, res) => {
             // Lưu dữ liệu vào cache và đặt thời gian sống (ttl) cho cache
             cache.set(cache_danhmuc_Key, dataAll, 60); // Ví dụ: cache tồn tại trong 60 giây
 
-            console.log(dataAll)
+            // console.log(dataAll)
             res.json(dataAll);
         }
 

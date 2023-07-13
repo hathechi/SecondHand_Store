@@ -2,12 +2,11 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import '../utils/push_screen.dart';
+import 'package:second_hand_store/models/sanpham.dart';
 
 // ignore: must_be_immutable
 class DetailScreen extends StatelessWidget {
-  DetailScreen({super.key});
+  DetailScreen({super.key, required this.sanphams});
   List arrImage = [
     "https://images.unsplash.com/photo-1575936123452-b67c3203c357?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8fDA%3D&w=1000&q=80",
     "https://us.123rf.com/450wm/dmitryag/dmitryag2105/dmitryag210506008/174519729-woman-outdoors-photographer-landscape-travel-professional-recreation.jpg?ver=6",
@@ -16,6 +15,7 @@ class DetailScreen extends StatelessWidget {
 
   // ignore: unused_field
   final int _currentPosition = 0;
+  final SanPham sanphams;
 
   @override
   Widget build(BuildContext context) {
@@ -29,16 +29,16 @@ class DetailScreen extends StatelessWidget {
                   width: double.infinity,
                   height: MediaQuery.of(context).size.height * 0.45,
                   child: imageSlider(
-                    arrImage: arrImage,
+                    arrImage: sanphams.imageArr!,
                     onClickBack: () {
-                      pop();
+                      Navigator.of(context).pop();
                     },
                   ),
                 ),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  child: const Column(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
@@ -48,19 +48,19 @@ class DetailScreen extends StatelessWidget {
                             flex: 1,
                             child: Row(
                               children: [
-                                CircleAvatar(
+                                const CircleAvatar(
                                   backgroundImage:
                                       AssetImage('assets/images/avatar.png'),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 8,
                                 ),
                                 Expanded(
                                   flex: 2,
                                   child: Text(
-                                    'Hà Thế Chi',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
+                                    sanphams.nguoidung!,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
@@ -72,8 +72,8 @@ class DetailScreen extends StatelessWidget {
                             child: Align(
                               alignment: Alignment.centerRight,
                               child: Text(
-                                '1.200.000đ',
-                                style: TextStyle(fontSize: 16),
+                                '${sanphams.gia} vnđ',
+                                style: const TextStyle(fontSize: 18),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
@@ -81,35 +81,47 @@ class DetailScreen extends StatelessWidget {
                         ],
                       ),
                       Padding(
-                        padding: EdgeInsets.only(top: 20),
+                        padding: const EdgeInsets.only(top: 20),
                         child: Text(
-                          'Máy rửa bát Toshiba',
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
+                          sanphams.tenSanpham!,
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.only(top: 20),
+                        padding: const EdgeInsets.only(top: 20),
                         child: Text.rich(
-                          TextSpan(text: 'Danh mục: ', children: [
-                            TextSpan(
-                              text: 'Đồ gia dụng  ',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ]),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 20),
-                        child: Text.rich(
-                          TextSpan(text: 'Tình trạng / Mô tả: ', children: [
-                            TextSpan(
-                              text: 'Còn ngon lắm =))',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
+                          TextSpan(
+                              text: 'Danh mục: ',
+                              style: const TextStyle(
+                                fontSize: 16,
                               ),
-                            ),
-                          ]),
+                              children: [
+                                TextSpan(
+                                  text: sanphams.danhmuc,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                ),
+                              ]),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: Text.rich(
+                          TextSpan(
+                              text: 'Tình trạng / Mô tả: ',
+                              style: const TextStyle(
+                                fontSize: 16,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: sanphams.moTa,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                ),
+                              ]),
                         ),
                       ),
                     ],
@@ -121,8 +133,35 @@ class DetailScreen extends StatelessWidget {
           Container(
             width: double.infinity,
             height: 60,
-            color: Colors.orange,
-            child: const Center(child: Text("Button")),
+            margin: const EdgeInsets.symmetric(horizontal: 40),
+            child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                  ),
+                ),
+                onPressed: () {},
+                child: const Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Liên hệ người bán',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    SizedBox(
+                      width: 8,
+                    ),
+                    Icon(
+                      CupertinoIcons.chevron_right_2,
+                      color: Colors.white,
+                    )
+                  ],
+                )),
+          ),
+          const SizedBox(
+            height: 16,
           ),
         ],
       ),

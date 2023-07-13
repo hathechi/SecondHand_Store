@@ -9,7 +9,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:second_hand_store/models/danhmuc.dart';
 import 'package:second_hand_store/provider/product_provider.dart';
+import 'package:second_hand_store/screens/detail_screen.dart';
 import 'package:second_hand_store/utils/colors.dart';
+import 'package:second_hand_store/utils/push_screen.dart';
 import 'package:second_hand_store/utils/show_toast.dart';
 
 import '../../provider/category_provider.dart';
@@ -87,6 +89,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
           "Timeless",
@@ -200,57 +203,72 @@ class _HomePageState extends State<HomePage> {
                               if (index < value.sanphams.length) {
                                 return Container(
                                   margin: const EdgeInsets.all(8),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Stack(
-                                        children: [
-                                          Builder(builder: (context) {
-                                            return SizedBox(
-                                              height: 200,
-                                              child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                child: Image.network(
-                                                  value.sanphams[index]
-                                                      .imageArr![0],
-                                                  fit: BoxFit.cover,
-                                                  width: double.infinity,
-                                                  height: double.infinity,
+                                  child: InkWell(
+                                    onTap: () {
+                                      pushScreen(
+                                        context,
+                                        DetailScreen(
+                                          sanphams: value.sanphams[index],
+                                        ),
+                                      );
+                                    },
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Stack(
+                                          children: [
+                                            Builder(builder: (context) {
+                                              return SizedBox(
+                                                height: 200,
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  child: Image.network(
+                                                    value.sanphams[index]
+                                                        .imageArr![0],
+                                                    fit: BoxFit.cover,
+                                                    width: double.infinity,
+                                                    height: double.infinity,
+                                                  ),
                                                 ),
-                                              ),
-                                            );
-                                          }),
-                                          Positioned(
-                                            bottom: 0,
-                                            left: 0,
-                                            child: Container(
-                                              padding: const EdgeInsets.all(8),
-                                              decoration: const BoxDecoration(
-                                                color: Colors.black87,
-                                                borderRadius: BorderRadius.only(
-                                                  topRight: Radius.circular(10),
-                                                  bottomLeft:
-                                                      Radius.circular(10),
+                                              );
+                                            }),
+                                            Positioned(
+                                              bottom: 0,
+                                              left: 0,
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(8),
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.black87,
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                    topRight:
+                                                        Radius.circular(10),
+                                                    bottomLeft:
+                                                        Radius.circular(10),
+                                                  ),
                                                 ),
-                                              ),
-                                              child: Text(
-                                                value.sanphams[index].danhmuc!,
-                                                style: const TextStyle(
-                                                    color: Colors.white),
+                                                child: Text(
+                                                  value
+                                                      .sanphams[index].danhmuc!,
+                                                  style: const TextStyle(
+                                                      color: Colors.white),
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      Container(
-                                        margin: const EdgeInsets.only(top: 8),
-                                        child: Text(
-                                          value.sanphams[index].gia.toString(),
+                                          ],
                                         ),
-                                      ),
-                                    ],
+                                        Container(
+                                          margin: const EdgeInsets.only(top: 8),
+                                          child: Text(
+                                            value.sanphams[index].gia
+                                                .toString(),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 );
                               } else {
@@ -281,13 +299,12 @@ class viewProductHorizontal extends StatelessWidget {
   final List products;
   final String title;
   final Function? onClickTitle;
-  final Function? onClickItemProduct;
+
   const viewProductHorizontal({
     super.key,
     required this.products,
     required this.title,
     this.onClickTitle,
-    this.onClickItemProduct,
   });
 
   @override
@@ -332,53 +349,63 @@ class viewProductHorizontal extends StatelessWidget {
               itemBuilder: (context, index) {
                 return Container(
                   margin: const EdgeInsets.all(8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Stack(
-                        children: [
-                          SizedBox(
-                            // width: MediaQuery.of(context).size.width * 0.6,
-                            // height: MediaQuery.of(context).size.height * 0.2,
-                            width: 300,
-                            height: 200,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image.network(
-                                products[index].imageArr[0],
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: double.infinity,
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: const BoxDecoration(
-                                color: Colors.black87,
-                                borderRadius: BorderRadius.only(
-                                  topRight: Radius.circular(10),
-                                  bottomLeft: Radius.circular(10),
+                  child: InkWell(
+                    onTap: () {
+                      pushScreen(
+                        context,
+                        DetailScreen(
+                          sanphams: products[index],
+                        ),
+                      );
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Stack(
+                          children: [
+                            SizedBox(
+                              // width: MediaQuery.of(context).size.width * 0.6,
+                              // height: MediaQuery.of(context).size.height * 0.2,
+                              width: 300,
+                              height: 200,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.network(
+                                  products[index].imageArr[0],
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: double.infinity,
                                 ),
                               ),
-                              child: Text(
-                                products[index].moTa,
-                                style: const TextStyle(color: Colors.white),
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              left: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: const BoxDecoration(
+                                  color: Colors.black87,
+                                  borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(10),
+                                    bottomLeft: Radius.circular(10),
+                                  ),
+                                ),
+                                child: Text(
+                                  products[index].moTa,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(top: 8),
-                        child: Text(
-                          "${products[index].gia} vnđ",
+                          ],
                         ),
-                      ),
-                    ],
+                        Container(
+                          margin: const EdgeInsets.only(top: 8),
+                          child: Text(
+                            "${products[index].gia} vnđ",
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
