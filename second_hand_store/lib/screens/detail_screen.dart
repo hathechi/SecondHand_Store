@@ -135,30 +135,31 @@ class DetailScreen extends StatelessWidget {
             height: 60,
             margin: const EdgeInsets.symmetric(horizontal: 40),
             child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                  ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(5)),
                 ),
-                onPressed: () {},
-                child: const Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Liên hệ người bán',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    SizedBox(
-                      width: 8,
-                    ),
-                    Icon(
-                      CupertinoIcons.chevron_right_2,
-                      color: Colors.white,
-                    )
-                  ],
-                )),
+              ),
+              onPressed: () {},
+              child: const Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Liên hệ người bán',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(
+                    width: 8,
+                  ),
+                  Icon(
+                    CupertinoIcons.chevron_right_2,
+                    color: Colors.white,
+                  )
+                ],
+              ),
+            ),
           ),
           const SizedBox(
             height: 16,
