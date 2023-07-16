@@ -1,6 +1,7 @@
 import express from 'express';
 var router = express.Router();
 import sanpham_controller from '../controllers/sanpham_controller.js'
+import upload from '../controllers/upload_image.js';
 
 //Router Sản Phẩm
 router.get('/api/sanpham', sanpham_controller.getAllData);

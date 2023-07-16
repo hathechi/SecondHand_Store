@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:second_hand_store/provider/google_signin.dart';
 
+import '../api_services/upload_service.dart';
 import '../permission/permission.dart';
 import '../utils/colors.dart';
 
@@ -423,7 +424,9 @@ class _AddProductState extends State<AddProduct> {
                       borderRadius: BorderRadius.all(Radius.circular(5)),
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    uploadImages(selectedImages, context);
+                  },
                   child: const Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,

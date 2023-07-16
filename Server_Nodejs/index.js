@@ -1,10 +1,12 @@
-import dotenv from "dotenv/config.js";
 import express from 'express';
 import bodyParser from 'body-parser';
 
 
 var app = express();
 app.use(express.json());
+//để xem được ảnh trong thư mục uploads, thêm dòng dưới
+app.use('/uploads', express.static('uploads'));
+
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
@@ -25,6 +27,11 @@ app.use(sanPham_router);
 //Danh Mục
 import danhMuc_router from './routers/danhmuc_router.js'
 app.use(danhMuc_router);
+//-----------------------------------------------------------------
+//upload image
+import upload from './routers/upload_router.js'
+app.use(upload);
+
 //-----------------------------------------------------------------
 
 // Middleware để xử lý yêu cầu không tìm thấy (404)

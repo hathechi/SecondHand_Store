@@ -7,7 +7,7 @@ class ProductService {
   static Future<Map<String, dynamic>> fetchData(int page) async {
     final response = await http.get(
       Uri.parse(
-          'http://${dotenv.env["IPV4_4g"]}:${dotenv.env["PORT"]}/api/sanpham/page/$page'),
+          'http://${dotenv.env["IPV4"]}:${dotenv.env["PORT"]}/api/sanpham/page/$page'),
       headers: {"Content-Type": "application/json"},
     );
 

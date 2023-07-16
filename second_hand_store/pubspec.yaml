@@ -61,6 +61,8 @@ dependencies:
   dotted_border: ^2.0.0+3
   image_picker: ^1.0.1
   permission_handler: ^10.4.3
+  flutter_image_compress: ^2.0.3
+  image_watermark: ^0.0.5
 
 
 dev_dependencies:
@@ -89,7 +91,6 @@ flutter:
   assets:
     - assets/images/
     - .env
-  #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
