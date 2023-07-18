@@ -4,10 +4,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:second_hand_store/provider/category_provider.dart';
+
 import 'package:second_hand_store/provider/google_signin.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:second_hand_store/provider/product_provider.dart';
-import 'package:second_hand_store/screens/detail_screen.dart';
 import 'package:second_hand_store/screens/splash_screen.dart';
 import 'firebase_options.dart';
 

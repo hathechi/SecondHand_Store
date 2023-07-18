@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -7,45 +8,62 @@ import 'package:image_watermark/image_watermark.dart';
 import 'package:provider/provider.dart';
 import '../provider/google_signin.dart';
 
-Future<void> uploadImages(List<XFile> imageFiles, BuildContext context) async {
-  final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
-  provider.isLoading = true;
+Future<List<String>> uploadImages(
+    List<XFile> imageFiles, BuildContext context) async {
+  List<String> urlImageUploads = [];
   var request = http.MultipartRequest(
       'POST',
       Uri.parse(
           'http://${dotenv.env["IPV4"]}:${dotenv.env["PORT"]}/api/upload'));
 
-  // for (var file in imageFiles) {
-  //   request.files.add(await http.MultipartFile.fromPath('image', file.path));
-  // }
   for (var file in imageFiles) {
-    final isValid = await validateImage(file);
-    if (isValid) {
-      final resizedImage = await resizeAndCompressImage(file);
-      final watermarkedImage = await addWatermarkToImage(resizedImage);
-      request.files.add(await http.MultipartFile.fromPath(
-        'image',
-        watermarkedImage.path,
-      ));
-      // final multipartFile = http.MultipartFile.fromBytes(
-      //   'image',
-      //   await resizedImage.readAsBytes(),
-      //   filename: 'image_${DateTime.now().millisecondsSinceEpoch}',
-      //   contentType: MediaType('image', 'jpeg'),
-      // );
-    }
+    request.files.add(await http.MultipartFile.fromPath(
+      'image',
+      file.path,
+    ));
+    // final isValid = await validateImage(file);
+    // if (isValid) {
+    // final resizedImage = await resizeAndCompressImage(file);
+    // final watermarkedImage = await addWatermarkToImage(resizedImage);
+    // request.files.add(await http.MultipartFile.fromPath(
+    //   'image',
+    //   watermarkedImage.path,
+    // ));
+    // final multipartFile = http.MultipartFile.fromBytes(
+    //   'image',
+    //   await resizedImage.readAsBytes(),
+    //   filename: 'image_${DateTime.now().millisecondsSinceEpoch}',
+    //   contentType: MediaType('image', 'jpeg'),
+    // );
+    // }
   }
 
   var response = await request.send();
   if (response.statusCode == 200) {
-    provider.isLoading = false;
+    // Receive JSON response
+    var jsonResponse = await response.stream
+        .transform(utf8.decoder)
+        .transform(json.decoder)
+        .single;
 
     print('Images uploaded successfully');
-  } else {
-    provider.isLoading = false;
+    print(jsonResponse);
+//Lặp json trả về để lấy fileName của hình trên server
+    if (jsonResponse is Map<String, dynamic>) {
+      var pathList = jsonResponse['path'] as List<dynamic>?;
+      pathList?.forEach((item) {
+        var path = item?['filename'] as String?;
+        // path != null ? print('Path: $path') : null;
+        urlImageUploads.add(path!);
+      });
 
+      //trả về list url image server
+      return urlImageUploads;
+    }
+  } else {
     print('Image upload failed');
   }
+  return urlImageUploads;
 }
 
 Future<File> addWatermarkToImage(File imageFile) async {

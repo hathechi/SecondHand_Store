@@ -2,7 +2,7 @@ import { DataTypes } from 'sequelize';
 import mydb from '../config/connect_mysql.js';
 
 const Image = mydb.define('url_image', {
-    id_image: {
+    id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true

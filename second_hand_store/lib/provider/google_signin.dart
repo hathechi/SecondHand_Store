@@ -4,6 +4,10 @@ import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:second_hand_store/api_services/user_service.dart';
+
+import '../screens/enter_pin_screen.dart';
+import '../utils/shared_preferences.dart';
 
 class GoogleSignInProvider extends ChangeNotifier {
   final googleSignIn = GoogleSignIn();
@@ -67,6 +71,10 @@ class GoogleSignInProvider extends ChangeNotifier {
 
       await FirebaseAuth.instance.signInWithCredential(credential);
       user = FirebaseAuth.instance.currentUser!;
+
+      //post user to server
+      await UserService.postData(user!);
+
       isLogged = true;
       dismiss();
 
@@ -78,11 +86,79 @@ class GoogleSignInProvider extends ChangeNotifier {
 
   Future logoutGoogle() async {
     showLoading();
-    await googleSignIn.disconnect();
     await FirebaseAuth.instance.signOut();
+    isLogged = false;
+    dismiss();
+    notifyListeners();
+
+    await googleSignIn.disconnect();
+    //xóa user khỏi local
+    deleteToLocalStorage('user');
 //Hoàn thành xong tác vụ thì dừng loading
     dismiss();
     isLogged = false;
+    notifyListeners();
+  }
+
+  ///// PHONE /////
+  ///
+  String verificationId = '';
+  String otp = '';
+
+  Future<void> signInWithPhoneNumber(
+      String phoneNumber, BuildContext context) async {
+    showLoading();
+
+    FirebaseAuth auth = FirebaseAuth.instance;
+
+    await auth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        // await auth.signInWithCredential(credential);
+        // print('Verification completed');
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        print('Verification failed: $e');
+      },
+      codeSent: (String verificationId, int? resendToken) {
+        this.verificationId = verificationId;
+
+        print('Code sent to $phoneNumber');
+        dismiss();
+
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => const EnterPin(),
+        ));
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {
+        // Xử lý khi quá thời gian chờ tự động nhận mã xác thực
+      },
+    );
+  }
+
+  Future<bool> signInWithOTP() async {
+    showLoading();
+    FirebaseAuth auth = FirebaseAuth.instance;
+    PhoneAuthCredential credential = PhoneAuthProvider.credential(
+      verificationId: verificationId,
+      smsCode: otp,
+    );
+    await auth.signInWithCredential(credential).then((value) {
+      dismiss();
+      isLogged = true;
+      notifyListeners();
+      print('Verification completed $value');
+      return true;
+    }).catchError((error) {
+      dismiss();
+      print('Verification failed: $error');
+      return false;
+    });
+    return false;
+  }
+
+  void setOTP(String otpValue) {
+    otp = otpValue;
     notifyListeners();
   }
 }

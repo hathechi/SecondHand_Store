@@ -27,6 +27,9 @@ app.use(sanPham_router);
 //Danh Mục
 import danhMuc_router from './routers/danhmuc_router.js'
 app.use(danhMuc_router);
+//Nguoidung
+import nguoiDung_router from './routers/nguoidung_router.js'
+app.use(nguoiDung_router);
 //-----------------------------------------------------------------
 //upload image
 import upload from './routers/upload_router.js'

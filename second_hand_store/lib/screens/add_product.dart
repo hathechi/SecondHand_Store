@@ -1,15 +1,19 @@
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:second_hand_store/api_services/product_service.dart';
+import 'package:second_hand_store/models/danhmuc.dart';
+import 'package:second_hand_store/models/sanpham.dart';
 import 'package:second_hand_store/provider/google_signin.dart';
-
+import 'package:second_hand_store/utils/shared_preferences.dart';
+import 'package:second_hand_store/utils/show_toast.dart';
 import '../api_services/upload_service.dart';
 import '../permission/permission.dart';
+import '../provider/category_provider.dart';
 import '../utils/colors.dart';
 
 class AddProduct extends StatefulWidget {
@@ -22,12 +26,12 @@ class AddProduct extends StatefulWidget {
 class _AddProductState extends State<AddProduct> {
   final _controllerName = TextEditingController();
   final _controllerMota = TextEditingController();
+  final _controllerGia = TextEditingController();
   final _controllerSDT = TextEditingController();
   final _controllerDiachi = TextEditingController();
+
   // ignore: non_constant_identifier_names
   String? selectedOption_thuonghieu;
-
-  List<String> options = ['Đồ gia dụng', 'Đồ điện tử', 'Quần áo cũ', 'Khác'];
 
   //getImage
   int selectedCount = 0; //lấy vị trí của ảnh trong mảng
@@ -36,13 +40,22 @@ class _AddProductState extends State<AddProduct> {
 
   Future<void> pickImageFromGallery() async {
     final pickedFile =
-        await picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 60);
     if (pickedFile != null) {
       log(pickedFile.path);
       setState(() {
         selectedImages.add(XFile(pickedFile.path));
       });
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    //Lấy dữ liệu của toàn bộ danh mục qua provider
+    final providerCategory =
+        Provider.of<CategoryProvider>(context, listen: false);
+    providerCategory.getAll();
   }
 
   @override
@@ -269,34 +282,70 @@ class _AddProductState extends State<AddProduct> {
                     SizedBox(
                       width: double.infinity,
                       height: 54,
-                      child: DropdownButtonFormField<String>(
-                        value: selectedOption_thuonghieu,
-                        onChanged: (value) {
-                          setState(() {
-                            selectedOption_thuonghieu = value;
-                          });
-                        },
-                        decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.only(left: 10),
-                            alignLabelWithHint: true,
-                            focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(width: 0.2),
-                                borderRadius: BorderRadius.circular(6)),
-                            hintText: 'Chọn danh mục',
-                            hintStyle: const TextStyle(fontSize: 15),
-                            border: OutlineInputBorder(
-                                borderSide: const BorderSide(width: 0.2),
-                                borderRadius: BorderRadius.circular(6))),
-                        items: options.map((String option) {
-                          return DropdownMenuItem<String>(
-                            value: option,
-                            child: Text(option),
+                      child: Consumer<CategoryProvider>(
+                        builder: (context, provider, child) {
+                          return DropdownButtonFormField<String>(
+                            value: selectedOption_thuonghieu,
+                            onChanged: (value) {
+                              setState(() {
+                                log(value.toString());
+                                selectedOption_thuonghieu = value;
+                              });
+                            },
+                            decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.only(left: 10),
+                                alignLabelWithHint: true,
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide: const BorderSide(width: 0.2),
+                                    borderRadius: BorderRadius.circular(6)),
+                                hintText: 'Chọn danh mục',
+                                hintStyle: const TextStyle(fontSize: 15),
+                                border: OutlineInputBorder(
+                                    borderSide: const BorderSide(width: 0.2),
+                                    borderRadius: BorderRadius.circular(6))),
+                            items: provider.danhmucs.map((DanhMuc option) {
+                              return DropdownMenuItem<String>(
+                                value: option.idDanhmuc.toString(),
+                                child: Text(option.tenDanhmuc!),
+                              );
+                            }).toList(),
                           );
-                        }).toList(),
+                        },
                       ),
                     ),
                     const SizedBox(
-                      height: 20,
+                      height: 10,
+                    ),
+                    const Text(
+                      'Giá',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    SizedBox(
+                      height: 54,
+                      child: TextFormField(
+                        controller: _controllerGia,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                            hintText: 'Giá',
+                            alignLabelWithHint: true,
+                            hintStyle: TextStyle(fontSize: 15),
+                            contentPadding: EdgeInsets.all(10),
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide(width: 0.2),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(6))),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(6)),
+                            ),
+                            floatingLabelBehavior: FloatingLabelBehavior.never),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
                     ),
                     const Text(
                       'Mô tả ',
@@ -424,8 +473,33 @@ class _AddProductState extends State<AddProduct> {
                       borderRadius: BorderRadius.all(Radius.circular(5)),
                     ),
                   ),
-                  onPressed: () {
-                    uploadImages(selectedImages, context);
+                  onPressed: () async {
+                    final provider = Provider.of<GoogleSignInProvider>(context,
+                        listen: false);
+                    provider.showLoading();
+                    var id = await getFromLocalStorage('user');
+
+                    // ignore: use_build_context_synchronously
+                    var url = await uploadImages(selectedImages, context);
+                    if (url.isNotEmpty && id != null) {
+                      var now = DateTime.now();
+                      var ngayTao = now.millisecondsSinceEpoch;
+                      var sanPham = SanPham(
+                          tenSanpham: _controllerName.text,
+                          idNguoidung: id['id_nguoidung'],
+                          idDanhmuc: int.parse(selectedOption_thuonghieu!),
+                          ngayTao: ngayTao,
+                          gia: double.parse(_controllerGia.text),
+                          sdt: _controllerSDT.text,
+                          diachi: _controllerDiachi.text,
+                          moTa: _controllerMota.text,
+                          status: false,
+                          imageArr: url);
+
+                      // ignore: use_build_context_synchronously
+                      postData(sanPham, context);
+                      provider.dismiss();
+                    }
                   },
                   child: const Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -445,5 +519,15 @@ class _AddProductState extends State<AddProduct> {
         ),
       ),
     );
+  }
+}
+
+void postData(SanPham sanPham, BuildContext context) async {
+  final insert = await ProductService.postData(sanPham);
+  if (insert) {
+    // ignore: use_build_context_synchronously
+    showSnackbar(context, "Thêm sản phẩm thành công", Colors.green);
+    // ignore: use_build_context_synchronously
+    Navigator.of(context).pop();
   }
 }

@@ -9,12 +9,13 @@ class ProductProvider extends ChangeNotifier {
   int totalPage = 1;
   List<SanPham> get sanphams => _sanphams;
 
-  Future<void> getAllProduct(int page) async {
+  Future<void> getAllProduct({int? page, int? limit}) async {
     isLoading = true;
     if (page == 1) {
       _sanphams.clear();
     }
-    final response = await ProductService.fetchData(page);
+    final response = await ProductService.fetchData(page: page, limit: limit);
+    print(response);
     List<SanPham> itemProduct = [];
     totalPage = await response["totalPage"];
     // log("Total Page $totalPage");

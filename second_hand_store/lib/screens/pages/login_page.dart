@@ -127,8 +127,7 @@ class _LoginPageState extends State<LoginPage> {
                                 urlImage:
                                     'https://e7.pngegg.com/pngimages/982/427/png-clipart-telephone-icon-telephone-call-computer-icons-iphone-symbol-telefono-electronics-rim.png',
                                 onClick: () {
-                                  showToast(
-                                      'Chức năng đang phát triển', Colors.red);
+                                  showPhoneInputDialog(context);
                                 },
                               ),
                             ),
@@ -145,6 +144,97 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+void showPhoneInputDialog(BuildContext context) async {
+  String? phoneNumber = await showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return const PhoneInputDialog();
+    },
+  );
+
+  if (phoneNumber != null) {
+    // Xử lý số điện thoại được nhập vào
+    // ignore: use_build_context_synchronously
+    final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
+    provider.signInWithPhoneNumber("+84$phoneNumber", context);
+  } else {
+    // Người dùng đã hủy nhập số điện thoại
+    print('Phone input cancelled');
+  }
+}
+
+class PhoneInputDialog extends StatefulWidget {
+  const PhoneInputDialog({super.key});
+
+  @override
+  _PhoneInputDialogState createState() => _PhoneInputDialogState();
+}
+
+class _PhoneInputDialogState extends State<PhoneInputDialog> {
+  final TextEditingController _phoneController = TextEditingController();
+  String? phoneNumber;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Tiếp tục với số điện thoại'),
+      contentPadding: const EdgeInsets.symmetric(vertical: 40, horizontal: 30),
+      content: Container(
+        width: 400,
+        height: 120,
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(30)),
+        child: SizedBox(
+          height: 70,
+          child: TextFormField(
+            keyboardType: TextInputType.phone,
+            maxLength: 10,
+            controller: _phoneController,
+            decoration: const InputDecoration(
+                prefixIcon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Text('+84'),
+                    )
+                  ],
+                ),
+                // hintText: '+84',
+                alignLabelWithHint: true,
+                hintStyle: TextStyle(fontSize: 15),
+                contentPadding: EdgeInsets.only(left: 16),
+                border: OutlineInputBorder(
+                    borderSide: BorderSide(width: 0.2),
+                    borderRadius: BorderRadius.all(Radius.circular(6))),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(6)),
+                ),
+                floatingLabelBehavior: FloatingLabelBehavior.never),
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            // Lấy giá trị số điện thoại từ TextField
+            phoneNumber = _phoneController.text;
+            // Đóng Dialog và trả về số điện thoại
+            Navigator.of(context).pop(phoneNumber);
+          },
+          child: const Text('Gửi OTP'),
+        ),
+        TextButton(
+          onPressed: () {
+            // Đóng Dialog mà không trả về giá trị
+            Navigator.of(context).pop();
+          },
+          child: const Text('Đóng'),
+        ),
+      ],
     );
   }
 }

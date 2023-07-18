@@ -28,8 +28,8 @@ const uploadImage = (req, res) => {
         }
 
         // Xử lý các ảnh tải lên tại đây (ví dụ: lưu vào cơ sở dữ liệu)
-        console.log('Images uploaded successfully', req.files)
-        return res.status(200).json('Images uploaded successfully');
+        console.log({ message: 'Images uploaded successfully', path: req.files })
+        return res.status(200).json({ message: 'Images uploaded successfully', path: req.files });
     });
 };
 export default uploadImage   

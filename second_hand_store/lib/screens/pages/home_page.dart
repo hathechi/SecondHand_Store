@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:second_hand_store/models/danhmuc.dart';
@@ -36,7 +37,7 @@ class _HomePageState extends State<HomePage> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       //Lấy dữ liệu của toàn bộ sản phẩm qua provider
       final provider = Provider.of<ProductProvider>(context, listen: false);
-      provider.getAllProduct(page);
+      provider.getAllProduct(page: page, limit: 5);
       //Lấy dữ liệu của toàn bộ danh mục qua provider
       final providerCategory =
           Provider.of<CategoryProvider>(context, listen: false);
@@ -59,7 +60,7 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           isLoadingMore = true;
         });
-        await provider.getAllProduct(page);
+        await provider.getAllProduct(page: page, limit: 5);
         log("Load Page: $page");
 
         setState(() {
@@ -124,7 +125,7 @@ class _HomePageState extends State<HomePage> {
                 Provider.of<ProductProvider>(context, listen: false);
             return Future<void>.delayed(const Duration(seconds: 1), () {
               log("reFresh");
-              provider.getAllProduct(1);
+              provider.getAllProduct(page: 1, limit: 5);
               page = 1;
             });
           },
@@ -225,8 +226,7 @@ class _HomePageState extends State<HomePage> {
                                                   borderRadius:
                                                       BorderRadius.circular(10),
                                                   child: Image.network(
-                                                    value.sanphams[index]
-                                                        .imageArr![0],
+                                                    '${dotenv.env["URL_IMAGE"]}${value.sanphams[index].imageArr![0]}',
                                                     fit: BoxFit.cover,
                                                     width: double.infinity,
                                                     height: double.infinity,
@@ -371,7 +371,7 @@ class viewProductHorizontal extends StatelessWidget {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
                                 child: Image.network(
-                                  products[index].imageArr[0],
+                                  '${dotenv.env["URL_IMAGE"]}${products[index].imageArr[0]}',
                                   fit: BoxFit.cover,
                                   width: double.infinity,
                                   height: double.infinity,

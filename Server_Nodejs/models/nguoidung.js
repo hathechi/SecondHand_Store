@@ -15,14 +15,11 @@ const NguoiDung = mydb.define('nguoidung', {
         type: DataTypes.STRING,
         allowNull: false
     },
-    sdt: {
-        type: DataTypes.STRING(11),
+    url_avatar: {
+        type: DataTypes.STRING(200),
         allowNull: false
     },
-    diachi: {
-        type: DataTypes.STRING(300),
-        allowNull: false
-    }
+
 }, {
     tableName: 'nguoidung',
     timestamps: false

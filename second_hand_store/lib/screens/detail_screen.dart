@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:second_hand_store/models/sanpham.dart';
 
 // ignore: must_be_immutable
@@ -194,7 +195,7 @@ class _imageSliderState extends State<imageSlider> {
           itemCount: widget.arrImage.length,
           itemBuilder: (BuildContext context, int index, int pageViewIndex) {
             return Image.network(
-              widget.arrImage[index],
+              '${dotenv.env["URL_IMAGE"]}${widget.arrImage[index]}',
               fit: BoxFit.cover,
             );
           },

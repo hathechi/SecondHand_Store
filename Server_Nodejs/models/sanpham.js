@@ -6,59 +6,6 @@ import DanhMuc from './danhmuc.js';
 import NguoiDung from './nguoidung.js';
 import Image from './image.js';
 
-// class SanPham extends Model {
-
-// }
-
-// SanPham.init(
-//     {
-
-//         // Các thuộc tính của bảng sanpham
-//         id_sanpham: {
-//             type: DataTypes.INTEGER,
-//             primaryKey: true,
-//             autoIncrement: true
-//         },
-//         ten_sanpham: {
-//             type: DataTypes.STRING,
-//             allowNull: true
-//         },
-//         id_nguoidung: {
-//             type: DataTypes.INTEGER,
-//             allowNull: false
-//         },
-//         id_danhmuc: {
-//             type: DataTypes.INTEGER,
-//             allowNull: false
-//         },
-//         ngay_tao: {
-//             type: DataTypes.STRING,
-//             allowNull: true
-//         },
-//         gio_tao: {
-//             type: DataTypes.STRING,
-//             allowNull: true
-//         },
-//         gia: {
-//             type: DataTypes.FLOAT,
-//             allowNull: true
-//         },
-//         mo_ta: {
-//             type: DataTypes.STRING,
-//             allowNull: true
-//         }
-//     },
-//     {
-//         modelName: 'sanpham',
-//         sequelize: mydb,
-//         timestamps: false,
-//     }
-// );
-// SanPham.belongsTo(DanhMuc); // Thiết lập quan hệ với model DanhMuc
-// SanPham.belongsTo(NguoiDung); // Thiết lập quan hệ với model NguoiDung
-
-// export default SanPham;
-// Định nghĩa model cho bảng SanPham
 const SanPham = mydb.define('sanpham', {
     id_sanpham: {
         type: DataTypes.INTEGER,
@@ -75,15 +22,19 @@ const SanPham = mydb.define('sanpham', {
         type: DataTypes.INTEGER
     },
     ngay_tao: {
-        type: DataTypes.DATE
+        type: DataTypes.NUMBER
     },
-    gio_tao: {
-        type: DataTypes.STRING
-    },
+
     gia: {
-        type: DataTypes.INTEGER
+        type: DataTypes.DOUBLE
     },
     mo_ta: {
+        type: DataTypes.STRING
+    },
+    sdt: {
+        type: DataTypes.STRING
+    },
+    diachi: {
         type: DataTypes.STRING
     },
     status: {

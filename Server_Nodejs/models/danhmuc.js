@@ -11,6 +11,10 @@ const DanhMuc = mydb.define('danhmuc', {
         type: DataTypes.STRING,
         allowNull: true
     },
+    url_image: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
     status: {
         type: DataTypes.BOOLEAN,
         allowNull: false

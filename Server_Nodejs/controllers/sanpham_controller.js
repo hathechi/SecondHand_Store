@@ -8,6 +8,11 @@ const cache = new NodeCache();
 
 
 const getAllData = async (req, res) => {
+    let page = !req.query.page ? 1 : req.query.page
+    let limit = !req.query.page ? 5 : req.query.page
+
+
+
     try {
         const cacheKey = 'getAllData'; // Khóa cache
 
@@ -119,9 +124,14 @@ const getByID = async (req, res) => {
 
 //get page
 const getPage = async (req, res) => {
+
+
     try {
-        let limit = 5;
-        let offset = (req.params.page - 1) * limit
+        let page = req.query.page ? Number(req.query.page) : 1
+        let limit = req.query.limit ? Number(req.query.limit) : 5
+
+        let offset = (page - 1) * limit
+
         const dataAll = await SanPham.findAll({
             include: [
                 {
@@ -139,7 +149,7 @@ const getPage = async (req, res) => {
         });
         if (dataAll != null) {
             let sanphams = (await SanPham.findAll()).length;
-            let totalPage = Math.round(sanphams / limit);
+            let totalPage = customRound(sanphams / limit);
             //dữ liệu trả về khi đã get ArrImage và loại bỏ key không mong muốn
             const modifiedData = await removeKey(dataAll);
             const arrImageProduct = await getArrImage(modifiedData);
@@ -152,7 +162,15 @@ const getPage = async (req, res) => {
         throw error;
     }
 }
-
+//Lấy số trang làm tròn lên
+function customRound(number) {
+    const decimalPart = number - Math.floor(number);
+    if (decimalPart <= 1.5) {
+        return Math.ceil(number);
+    } else {
+        return Math.round(number);
+    }
+}
 const searchByID = async (id) => {
     const search = await SanPham.findOne({
         where: {
@@ -173,17 +191,33 @@ const searchByID = async (id) => {
 //insert data 
 const insertData = async (req, res) => {
     try {
-        const insert = await SanPham.create({
-            ten_sanpham: req.body.ten_sanpham,
-            id_nguoidung: req.body.id_nguoidung,
-            id_danhmuc: req.body.id_danhmuc,
-            ngay_tao: req.body.ngay_tao,
-            gio_tao: req.body.gio_tao,
-            gia: req.body.gia,
-            mo_ta: req.body.mo_ta,
-            status: req.body.status
-        });
-        insert ? res.json({ status: true, message: "insert succsess" + insert }) : res.status(404).json({ status: false, message: "insert false" })
+        console.log(req.body)
+        if (req.body) {
+            await SanPham.create({
+                ten_sanpham: req.body.ten_sanpham,
+                id_nguoidung: req.body.id_nguoidung,
+                id_danhmuc: req.body.id_danhmuc,
+                ngay_tao: req.body.ngay_tao,
+                gia: req.body.gia,
+                mo_ta: req.body.mo_ta,
+                sdt: req.body.sdt,
+                diachi: req.body.diachi,
+                status: false
+            }).then((sp) => {
+                if (sp) {
+                    for (let i = 0; i < req.body.imageArr.length; i++) {
+                        Image.create({ url: req.body.imageArr[i], id_sanpham: sp['dataValues'].id_sanpham }).then((img) => {
+                            // console.log('IMG', img)
+                        })
+                    }
+                    res.json({ status: true, message: "insert succsess" })
+                } else {
+                    res.status(404).json({ status: false, message: "insert false" })
+                }
+            })
+        }
+
+        // insert ? res.json({ status: true, message: "insert succsess" + insert }) : res.status(404).json({ status: false, message: "insert false" })
     } catch (error) {
         console.log(error)
         throw error
