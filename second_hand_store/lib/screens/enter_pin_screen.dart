@@ -106,15 +106,19 @@ class _EnterPinState extends State<EnterPin> {
                         final otp = pinController.text.trim();
                         log(otp);
                         provider.setOTP(otp);
-                        final check = await provider.signInWithOTP();
-                        if (check) {
-                          // ignore: use_build_context_synchronously
-                          Navigator.of(context).pop();
-                        } else {
-                          // ignore: use_build_context_synchronously
-                          showSnackbar(
-                              context, 'Code bạn nhập chưa đúng', Colors.red);
-                        }
+                        await provider.signInWithOTP().then(
+                          (value) {
+                            log("Value $value");
+                            if (value) {
+                              // ignore: use_build_context_synchronously
+                              Navigator.of(context).pop();
+                            } else {
+                              // ignore: use_build_context_synchronously
+                              showSnackbar(context, 'Code bạn nhập chưa đúng',
+                                  Colors.red);
+                            }
+                          },
+                        );
                       },
                       label: const Text(
                         'Continue',

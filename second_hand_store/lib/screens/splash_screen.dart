@@ -33,6 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
             provider.isLogged = snapshot.hasData;
           }
 
+          // return const HomeTest();
           return const HomeScreen();
         },
       ),

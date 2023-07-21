@@ -1,5 +1,6 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +8,7 @@ import 'package:second_hand_store/provider/category_provider.dart';
 
 import 'package:second_hand_store/provider/google_signin.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:second_hand_store/provider/hide_bottom_nav.dart';
 import 'package:second_hand_store/provider/product_provider.dart';
 import 'package:second_hand_store/screens/splash_screen.dart';
 import 'firebase_options.dart';
@@ -18,6 +20,10 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await dotenv.load(fileName: ".env");
+  //Trong suốt thanh status bar
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+  ));
   runApp(const MyApp());
 }
 
@@ -38,6 +44,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => CategoryProvider(),
         ),
+        ChangeNotifierProvider(
+          create: (context) => HideBottomNavProvider(),
+        ),
 
         //Something
       ],
@@ -49,9 +58,10 @@ class MyApp extends StatelessWidget {
             return child;
           },
           theme: ThemeData(
-            brightness: Brightness.light,
-            fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
-          ),
+              brightness: Brightness.light,
+              fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
+              appBarTheme:
+                  const AppBarTheme(backgroundColor: Colors.transparent)),
           navigatorObservers: [BotToastNavigatorObserver()],
           debugShowCheckedModeBanner: false,
           home: Stack(alignment: Alignment.center, children: [

@@ -34,7 +34,7 @@ class SanPham {
     idNguoidung = json['id_nguoidung'];
     idDanhmuc = json['id_danhmuc'];
     ngayTao = json['ngay_tao'];
-    gia = json['gia'];
+    gia = json['gia'] != null ? double.parse(json['gia'].toString()) : null;
     moTa = json['mo_ta'];
     sdt = json['sdt'];
     diachi = json['diachi'];

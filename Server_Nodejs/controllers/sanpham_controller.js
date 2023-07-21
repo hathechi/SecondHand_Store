@@ -7,53 +7,53 @@ import NodeCache from 'node-cache';
 const cache = new NodeCache();
 
 
-const getAllData = async (req, res) => {
-    let page = !req.query.page ? 1 : req.query.page
-    let limit = !req.query.page ? 5 : req.query.page
+// const getAllData = async (req, res) => {
+//     let page = !req.query.page ? 1 : req.query.page
+//     let limit = !req.query.page ? 5 : req.query.page
 
 
 
-    try {
-        const cacheKey = 'getAllData'; // Khóa cache
+//     try {
+//         const cacheKey = 'getAllData'; // Khóa cache
 
-        // Kiểm tra xem dữ liệu có tồn tại trong cache không
-        const cachedData = cache.get(cacheKey);
-        if (cachedData) {
-            console.log('Trả về dữ liệu từ cache', cachedData);
-            res.json(cachedData);
+//         // Kiểm tra xem dữ liệu có tồn tại trong cache không
+//         const cachedData = cache.get(cacheKey);
+//         if (cachedData) {
+//             console.log('Trả về dữ liệu từ cache', cachedData);
+//             res.json(cachedData);
 
-        } else {
-            const dataAll = await SanPham.findAll({
-                include: [
-                    {
-                        model: DanhMuc,
-                        attributes: ['ten_danhmuc'],
-                    },
-                    {
-                        model: NguoiDung,
-                        attributes: ['ten'],
-                    }
-                ],
-                order: [['id_sanpham', 'DESC']],
-            })
-            //dữ liệu trả về khi đã loại bỏ key không mong muốn
-            const modifiedData = await removeKey(dataAll);
-            const arrImageProduct = await getArrImage(modifiedData);
+//         } else {
+//             const dataAll = await SanPham.findAll({
+//                 include: [
+//                     {
+//                         model: DanhMuc,
+//                         attributes: ['ten_danhmuc'],
+//                     },
+//                     {
+//                         model: NguoiDung,
+//                         attributes: ['ten'],
+//                     }
+//                 ],
+//                 order: [['id_sanpham', 'DESC']],
+//             })
+//             //dữ liệu trả về khi đã loại bỏ key không mong muốn
+//             const modifiedData = await removeKey(dataAll);
+//             const arrImageProduct = await getArrImage(modifiedData);
 
-            // Lưu dữ liệu vào cache và đặt thời gian sống (ttl) cho cache
-            cache.set(cacheKey, arrImageProduct, 60); // Ví dụ: cache tồn tại trong 60 giây
+//             // Lưu dữ liệu vào cache và đặt thời gian sống (ttl) cho cache
+//             cache.set(cacheKey, arrImageProduct, 60); // Ví dụ: cache tồn tại trong 60 giây
 
-            console.log(arrImageProduct)
-            res.json(arrImageProduct);
-        }
+//             console.log(arrImageProduct)
+//             res.json(arrImageProduct);
+//         }
 
 
 
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
-};
+//     } catch (error) {
+//         console.error(error);
+//         throw error;
+//     }
+// };
 //loại bỏ các key danhmuc, nguoidung không cần thiết
 const removeKey = (data) => {
     const modifiedData = data.map(item => {
@@ -98,21 +98,30 @@ const getArrImage = async (modifiedData) => {
 //get by id
 const getByID = async (req, res) => {
     try {
-        const dataAll = await SanPham.findOne({
-            where: { id_sanpham: req.params.id },
-            include: [{
-                model: DanhMuc,
-                attributes: ['ten_danhmuc']
-            },
-            {
-                model: NguoiDung,
-                attributes: ['ten']
-            }]
+
+        const dataAll = await SanPham.findAll({
+            where: { id_nguoidung: req.query.id, status: 0 },
+            include: [
+                {
+                    model: DanhMuc,
+                    attributes: ['ten_danhmuc']
+                },
+                {
+                    model: NguoiDung,
+                    attributes: ['ten']
+                }
+            ],
+
+            order: [['id_sanpham', 'DESC']]
         });
-        if (dataAll != null) {
+
+        if (dataAll.length > 0) {
+            // let sanphams = (await SanPham.findAll()).length;
+            // let totalPage = customRound(sanphams / limit);
             //dữ liệu trả về khi đã get ArrImage và loại bỏ key không mong muốn
-            const modifiedData = await getArrImage(dataAll);
-            res.status(200).json(modifiedData)
+            const modifiedData = await removeKey(dataAll);
+            const arrImageProduct = await getArrImage(modifiedData);
+            res.status(200).json({ length: dataAll.length, arrImageProduct })
         } else {
             res.status(404).json('NO DATA');
         }
@@ -125,7 +134,6 @@ const getByID = async (req, res) => {
 //get page
 const getPage = async (req, res) => {
 
-
     try {
         let page = req.query.page ? Number(req.query.page) : 1
         let limit = req.query.limit ? Number(req.query.limit) : 5
@@ -133,6 +141,7 @@ const getPage = async (req, res) => {
         let offset = (page - 1) * limit
 
         const dataAll = await SanPham.findAll({
+            where: { status: 0 },
             include: [
                 {
                     model: DanhMuc,
@@ -148,7 +157,7 @@ const getPage = async (req, res) => {
             order: [['id_sanpham', 'DESC']]
         });
         if (dataAll != null) {
-            let sanphams = (await SanPham.findAll()).length;
+            let sanphams = (await SanPham.findAll({ where: { status: 0 } })).length;
             let totalPage = customRound(sanphams / limit);
             //dữ liệu trả về khi đã get ArrImage và loại bỏ key không mong muốn
             const modifiedData = await removeKey(dataAll);
@@ -175,7 +184,7 @@ const searchByID = async (id) => {
     const search = await SanPham.findOne({
         where: {
             //tìm các sản phẩm có status = 0 (sản phẩm chưa bị xóa)
-            // status: 0,
+            status: 0,
             id_sanpham: id
         }
     })
@@ -191,7 +200,7 @@ const searchByID = async (id) => {
 //insert data 
 const insertData = async (req, res) => {
     try {
-        console.log(req.body)
+        console.log("INSERT: " + req.body)
         if (req.body) {
             await SanPham.create({
                 ten_sanpham: req.body.ten_sanpham,
@@ -226,26 +235,36 @@ const insertData = async (req, res) => {
 //update data 
 const updateData = async (req, res) => {
     try {
-        //tìm sản phẩm theo id trước, nếu tìm thấy sản phẩm thì mới cập nhật
+        console.log("UPDATE: " + req.body)
         if (await searchByID(req.body.id_sanpham)) {
-            const update = await SanPham.update({
+            await SanPham.update({
                 ten_sanpham: req.body.ten_sanpham,
-                id_nguoidung: req.body.id_nguoidung,
+                // id_nguoidung: req.body.id_nguoidung,
                 id_danhmuc: req.body.id_danhmuc,
-                ngay_tao: req.body.ngay_tao,
-                gio_tao: req.body.gio_tao,
+                // ngay_tao: req.body.ngay_tao,
                 gia: req.body.gia,
                 mo_ta: req.body.mo_ta,
-                status: req.body.status
-
+                sdt: req.body.sdt,
+                diachi: req.body.diachi,
+                // status: false
             },
-                { where: { id_sanpham: req.body.id_sanpham } });
-            console.log(update)
-            update ? res.status(200).json({ status: true, message: "update succsess" }) : res.status(404).json({ status: false, message: "update false" })
+                { where: { id_sanpham: req.body.id_sanpham } }).then((sp) => {
+                    if (sp) {
+                        for (let i = 0; i < req.body.imageArr.length; i++) {
+                            Image.update({ url: req.body.imageArr[i] }, { where: { id_sanpham: req.body.id_sanpham } }).then((img) => {
+                                console.log('UPDATE IMG ', img)
+                            })
+                        }
+                        res.json({ status: true, message: "Update succsess" })
+                    } else {
+                        res.status(404).json({ status: false, message: "Update false" })
+                    }
+                })
         } else {
             res.status(404).json({ status: false, message: `id_sanpham ${req.body.id_sanpham} not found` })
         }
 
+        // insert ? res.json({ status: true, message: "insert succsess" + insert }) : res.status(404).json({ status: false, message: "insert false" })
     } catch (error) {
         console.log(error)
         throw error
@@ -254,6 +273,7 @@ const updateData = async (req, res) => {
 
 //Delete data 
 const deleteData = async (req, res) => {
+    console.log("ID DELETE: ", req.body.id_sanpham)
     try {
         if (await searchByID(req.body.id_sanpham)) {
             const deleteData = await SanPham.update({
@@ -329,7 +349,7 @@ const deleteData = async (req, res) => {
 
 //export với nhiều hàm khi sử dụng export default
 const exportObject = {
-    getAllData,
+    // getAllData,
     getByID,
     getPage,
     insertData,

@@ -5,8 +5,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_watermark/image_watermark.dart';
-import 'package:provider/provider.dart';
-import '../provider/google_signin.dart';
 
 Future<List<String>> uploadImages(
     List<XFile> imageFiles, BuildContext context) async {

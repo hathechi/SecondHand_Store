@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:second_hand_store/api_services/user_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../screens/enter_pin_screen.dart';
 import '../utils/shared_preferences.dart';
@@ -94,6 +95,9 @@ class GoogleSignInProvider extends ChangeNotifier {
     await googleSignIn.disconnect();
     //xóa user khỏi local
     deleteToLocalStorage('user');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('verificationId');
+
 //Hoàn thành xong tác vụ thì dừng loading
     dismiss();
     isLogged = false;
@@ -110,6 +114,7 @@ class GoogleSignInProvider extends ChangeNotifier {
     showLoading();
 
     FirebaseAuth auth = FirebaseAuth.instance;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
 
     await auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
@@ -122,7 +127,9 @@ class GoogleSignInProvider extends ChangeNotifier {
       },
       codeSent: (String verificationId, int? resendToken) {
         this.verificationId = verificationId;
-
+        //Lưu mã verificationId lại
+        prefs.setString('verificationId', verificationId);
+        log('save key ok');
         print('Code sent to $phoneNumber');
         dismiss();
 
@@ -137,24 +144,28 @@ class GoogleSignInProvider extends ChangeNotifier {
   }
 
   Future<bool> signInWithOTP() async {
+    bool? checkLogin;
     showLoading();
     FirebaseAuth auth = FirebaseAuth.instance;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    log("key: ${prefs.getString('verificationId')!}");
     PhoneAuthCredential credential = PhoneAuthProvider.credential(
-      verificationId: verificationId,
+      verificationId: prefs.getString('verificationId')!,
       smsCode: otp,
     );
     await auth.signInWithCredential(credential).then((value) {
       dismiss();
       isLogged = true;
-      notifyListeners();
       print('Verification completed $value');
-      return true;
+      checkLogin = true;
+      notifyListeners();
     }).catchError((error) {
       dismiss();
       print('Verification failed: $error');
-      return false;
+      checkLogin = false;
     });
-    return false;
+    return checkLogin!;
   }
 
   void setOTP(String otpValue) {

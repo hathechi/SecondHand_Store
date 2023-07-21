@@ -123,7 +123,7 @@ class _HomePageState extends State<HomePage> {
           onRefresh: () async {
             final provider =
                 Provider.of<ProductProvider>(context, listen: false);
-            return Future<void>.delayed(const Duration(seconds: 1), () {
+            return Future<void>.delayed(const Duration(milliseconds: 500), () {
               log("reFresh");
               provider.getAllProduct(page: 1, limit: 5);
               page = 1;
@@ -206,11 +206,17 @@ class _HomePageState extends State<HomePage> {
                                   margin: const EdgeInsets.all(8),
                                   child: InkWell(
                                     onTap: () {
+                                      // final provider =
+                                      //     Provider.of<HideBottomNavProvider>(
+                                      //         context,
+                                      //         listen: false);
+                                      // provider.hideBottomNav();
+
                                       pushScreen(
                                         context,
                                         DetailScreen(
-                                          sanphams: value.sanphams[index],
-                                        ),
+                                            sanphams: value.sanphams[index],
+                                            saleOrEdit: true),
                                       );
                                     },
                                     child: Column(
@@ -354,8 +360,7 @@ class viewProductHorizontal extends StatelessWidget {
                       pushScreen(
                         context,
                         DetailScreen(
-                          sanphams: products[index],
-                        ),
+                            sanphams: products[index], saleOrEdit: true),
                       );
                     },
                     child: Column(
@@ -391,7 +396,7 @@ class viewProductHorizontal extends StatelessWidget {
                                   ),
                                 ),
                                 child: Text(
-                                  products[index].moTa,
+                                  products[index].danhmuc,
                                   style: const TextStyle(color: Colors.white),
                                 ),
                               ),

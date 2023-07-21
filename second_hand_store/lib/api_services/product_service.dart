@@ -23,12 +23,62 @@ class ProductService {
     }
   }
 
+  static Future fetchDataWithID({String? id}) async {
+    final response = await http.get(
+      Uri.parse(
+        "http://${dotenv.env["IPV4"]}:${dotenv.env["PORT"]}/api/sanpham/user?id=$id",
+      ),
+      headers: {"Content-Type": "application/json"},
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonResponse = json.decode(response.body);
+      print(json.decode(response.body));
+      return jsonResponse;
+    } else {
+      return {};
+      // throw Exception('Failed to fetch data');
+    }
+  }
+
   static Future<bool> postData(SanPham sanPham) async {
     final response = await http.post(
         Uri.parse(
             'http://${dotenv.env["IPV4"]}:${dotenv.env["PORT"]}/api/sanpham'),
         headers: {"Content-Type": "application/json"},
         body: json.encode(sanPham));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      log(jsonResponse.toString());
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  static Future<bool> updateData(SanPham sanPham) async {
+    final response = await http.put(
+        Uri.parse(
+            'http://${dotenv.env["IPV4"]}:${dotenv.env["PORT"]}/api/sanpham'),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode(sanPham));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      log(jsonResponse.toString());
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  static Future<bool> deleteData(int idSanpham) async {
+    final response = await http.delete(
+        Uri.parse(
+            'http://${dotenv.env["IPV4"]}:${dotenv.env["PORT"]}/api/sanpham'),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({"id_sanpham": idSanpham}));
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);

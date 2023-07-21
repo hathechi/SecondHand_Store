@@ -55,11 +55,25 @@ Future<void> pushReplacement(BuildContext context, Widget child) async {
   );
 }
 
-void pop() {
-  if (navKey.currentState!.canPop()) {
-    navKey.currentState!.pop();
-  }
+void pop(BuildContext context) {
+  Navigator.of(context).pop();
 }
+
+void pushAndRemoveUntil(BuildContext context, Widget child) {
+  hideKeyboard();
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(
+        builder: (context) => child), // Trang mới bạn muốn thêm vào stack
+    (Route<dynamic> route) => false, // Predicate để loại bỏ tất cả các trang
+  );
+}
+// void pop() {
+//   if (navKey.currentState!.canPop()) {
+//     navKey.currentState!.pop();
+//   }
+// }
+
 
 // void pushAndRemoveUntil({Widget? child}) {
 //   hideKeyboard();

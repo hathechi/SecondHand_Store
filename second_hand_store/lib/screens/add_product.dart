@@ -3,12 +3,15 @@ import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:second_hand_store/api_services/product_service.dart';
 import 'package:second_hand_store/models/danhmuc.dart';
 import 'package:second_hand_store/models/sanpham.dart';
 import 'package:second_hand_store/provider/google_signin.dart';
+import 'package:second_hand_store/screens/pages/profile_page.dart';
+import 'package:second_hand_store/utils/push_screen.dart';
 import 'package:second_hand_store/utils/shared_preferences.dart';
 import 'package:second_hand_store/utils/show_toast.dart';
 import '../api_services/upload_service.dart';
@@ -17,10 +20,11 @@ import '../provider/category_provider.dart';
 import '../utils/colors.dart';
 
 class AddProduct extends StatefulWidget {
-  const AddProduct({super.key});
+  const AddProduct({super.key, this.sanPham});
 
   @override
   State<AddProduct> createState() => _AddProductState();
+  final SanPham? sanPham;
 }
 
 class _AddProductState extends State<AddProduct> {
@@ -38,6 +42,11 @@ class _AddProductState extends State<AddProduct> {
   List<XFile> selectedImages = [];
   final picker = ImagePicker();
 
+  //List image push từ detail qua
+  List<String> listImageFromDetail = [];
+  //biến kiểm tra xem là update hay insert
+  bool isUpdate = false;
+
   Future<void> pickImageFromGallery() async {
     final pickedFile =
         await picker.pickImage(source: ImageSource.gallery, imageQuality: 60);
@@ -49,6 +58,18 @@ class _AddProductState extends State<AddProduct> {
     }
   }
 
+  void _pushDataController(SanPham sanPham) {
+    _controllerName.text = sanPham.tenSanpham!;
+    _controllerDiachi.text = sanPham.diachi!;
+    _controllerGia.text = sanPham.gia!.toString();
+    _controllerMota.text = sanPham.moTa!;
+    _controllerSDT.text = sanPham.sdt!;
+    //sao chép mảng thành mảng mới
+    listImageFromDetail = List.from(sanPham.imageArr!);
+    //nếu có dữ liệu chuyển biến check update thành true để đổi chức năng
+    isUpdate = true;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -56,6 +77,10 @@ class _AddProductState extends State<AddProduct> {
     final providerCategory =
         Provider.of<CategoryProvider>(context, listen: false);
     providerCategory.getAll();
+
+    if (widget.sanPham != null) {
+      _pushDataController(widget.sanPham!);
+    }
   }
 
   @override
@@ -177,6 +202,44 @@ class _AddProductState extends State<AddProduct> {
                           scrollDirection: Axis.horizontal,
                           itemCount: 5,
                           itemBuilder: (context, index) {
+                            //khi sửa sản phẩm, hiển thị image lên listview
+                            if (index < listImageFromDetail.length) {
+                              return Container(
+                                width: 90,
+                                height: 90,
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 12),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  image: DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: NetworkImage(
+                                      "${dotenv.env['URL_IMAGE']}${listImageFromDetail[index]}",
+                                    ),
+                                  ),
+                                ),
+                                child: Stack(children: [
+                                  Positioned(
+                                    top: -5,
+                                    right: -5,
+                                    child: IconButton(
+                                      onPressed: () {
+                                        setState(
+                                          () {
+                                            listImageFromDetail.removeAt(index);
+                                          },
+                                        );
+                                      },
+                                      icon: const Icon(
+                                        CupertinoIcons.clear_circled_solid,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ]),
+                              );
+                            }
+                            //khi chọn sản phẩm từ thư viện rồi hiển thị lên listview
                             if (index < selectedCount) {
                               // Hiển thị hình ảnh trong các ô đã chọn
                               return Container(
@@ -461,61 +524,117 @@ class _AddProductState extends State<AddProduct> {
                   ],
                 ),
               ),
-              Container(
-                width: double.infinity,
-                height: 54,
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 40, vertical: 30),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
+              !isUpdate
+                  ? btnSubmit(
+                      title: 'Đăng sản phẩm',
+                      onTap: () async {
+                        final provider = Provider.of<GoogleSignInProvider>(
+                            context,
+                            listen: false);
+                        provider.showLoading();
+                        var id = await getFromLocalStorage('user');
+                        // ignore: use_build_context_synchronously
+                        var url = await uploadImages(selectedImages, context);
+                        if (url.isNotEmpty && id != null) {
+                          var now = DateTime.now();
+                          var ngayTao = now.millisecondsSinceEpoch;
+                          var sanPham = SanPham(
+                              tenSanpham: _controllerName.text,
+                              idNguoidung: id['id_nguoidung'],
+                              idDanhmuc: int.parse(selectedOption_thuonghieu!),
+                              ngayTao: ngayTao,
+                              gia: double.parse(_controllerGia.text),
+                              sdt: _controllerSDT.text,
+                              diachi: _controllerDiachi.text,
+                              moTa: _controllerMota.text,
+                              status: false,
+                              imageArr: url);
+
+                          // ignore: use_build_context_synchronously
+                          postData(sanPham, context);
+                          provider.dismiss();
+                        }
+                      },
+                    )
+                  : btnSubmit(
+                      title: 'Sửa sản phẩm',
+                      onTap: () async {
+                        final provider = Provider.of<GoogleSignInProvider>(
+                            context,
+                            listen: false);
+                        provider.showLoading();
+                        // var id = await getFromLocalStorage('user');
+                        List<String> url = [];
+                        if (selectedImages.isNotEmpty) {
+                          // ignore: use_build_context_synchronously
+                          url = await uploadImages(selectedImages, context);
+                        } else {
+                          url = listImageFromDetail;
+                        }
+                        if (url.isNotEmpty) {
+                          var sanPham = SanPham(
+                            idSanpham: widget.sanPham!.idSanpham,
+                            tenSanpham: _controllerName.text,
+                            idNguoidung: widget.sanPham!.idNguoidung,
+                            idDanhmuc: int.parse(selectedOption_thuonghieu!),
+                            ngayTao: widget.sanPham!.ngayTao,
+                            gia: double.parse((_controllerGia.text).toString()),
+                            sdt: _controllerSDT.text,
+                            diachi: _controllerDiachi.text,
+                            moTa: _controllerMota.text,
+                            status: widget.sanPham!.status,
+                            imageArr: url,
+                          );
+
+                          // ignore: use_build_context_synchronously
+                          updateData(sanPham, context);
+                          provider.dismiss();
+                        }
+                      },
                     ),
-                  ),
-                  onPressed: () async {
-                    final provider = Provider.of<GoogleSignInProvider>(context,
-                        listen: false);
-                    provider.showLoading();
-                    var id = await getFromLocalStorage('user');
-
-                    // ignore: use_build_context_synchronously
-                    var url = await uploadImages(selectedImages, context);
-                    if (url.isNotEmpty && id != null) {
-                      var now = DateTime.now();
-                      var ngayTao = now.millisecondsSinceEpoch;
-                      var sanPham = SanPham(
-                          tenSanpham: _controllerName.text,
-                          idNguoidung: id['id_nguoidung'],
-                          idDanhmuc: int.parse(selectedOption_thuonghieu!),
-                          ngayTao: ngayTao,
-                          gia: double.parse(_controllerGia.text),
-                          sdt: _controllerSDT.text,
-                          diachi: _controllerDiachi.text,
-                          moTa: _controllerMota.text,
-                          status: false,
-                          imageArr: url);
-
-                      // ignore: use_build_context_synchronously
-                      postData(sanPham, context);
-                      provider.dismiss();
-                    }
-                  },
-                  child: const Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Đăng bán',
-                        style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class btnSubmit extends StatelessWidget {
+  const btnSubmit({
+    super.key,
+    required this.onTap,
+    required this.title,
+  });
+
+  final Function onTap;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: 54,
+      margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 30),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.black,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+          ),
+        ),
+        onPressed: () async {
+          onTap();
+        },
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
       ),
     );
@@ -529,5 +648,15 @@ void postData(SanPham sanPham, BuildContext context) async {
     showSnackbar(context, "Thêm sản phẩm thành công", Colors.green);
     // ignore: use_build_context_synchronously
     Navigator.of(context).pop();
+  }
+}
+
+void updateData(SanPham sanPham, BuildContext context) async {
+  final update = await ProductService.updateData(sanPham);
+  if (update) {
+    // ignore: use_build_context_synchronously
+    showSnackbar(context, "Sửa sản phẩm thành công", Colors.green);
+    // ignore: use_build_context_synchronously
+    pushReplacement(context, const ProfilePage());
   }
 }

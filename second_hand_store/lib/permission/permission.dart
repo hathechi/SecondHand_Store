@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:permission_handler/permission_handler.dart';
 
 Future<bool> requestPermission() async {
