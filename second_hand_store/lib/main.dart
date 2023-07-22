@@ -10,7 +10,7 @@ import 'package:second_hand_store/provider/google_signin.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:second_hand_store/provider/hide_bottom_nav.dart';
 import 'package:second_hand_store/provider/product_provider.dart';
-import 'package:second_hand_store/screens/hathechi_test.dart';
+
 import 'package:second_hand_store/screens/splash_screen.dart';
 import 'firebase_options.dart';
 
@@ -66,10 +66,7 @@ class MyApp extends StatelessWidget {
           navigatorObservers: [BotToastNavigatorObserver()],
           debugShowCheckedModeBanner: false,
           home: Stack(alignment: Alignment.center, children: [
-            const Test(),
-            // const SplashScreen(),
-            // DetailScreen(),
-
+            const SplashScreen(),
             Builder(builder: (context) {
               final providerGoogle =
                   Provider.of<GoogleSignInProvider>(context, listen: true);

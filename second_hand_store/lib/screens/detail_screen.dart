@@ -271,6 +271,8 @@ void _showBottomSheet(BuildContext context, SanPham sanphams) {
               icon: const Icon(CupertinoIcons.pencil),
               title: 'Sửa sản phẩm',
               function: () {
+                pop(context);
+
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => AddProduct(
@@ -288,6 +290,8 @@ void _showBottomSheet(BuildContext context, SanPham sanphams) {
               ),
               title: 'Xóa sản phẩm',
               function: () {
+                pop(context);
+
                 final provider =
                     Provider.of<GoogleSignInProvider>(context, listen: false);
 

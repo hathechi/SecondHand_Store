@@ -140,7 +140,7 @@ class _HomePageState extends State<HomePage> {
                 listViewSale(listImageSale: listImageSale),
                 listViewCategory(
                     danhmuc:
-                        Provider.of<CategoryProvider>(context, listen: false)
+                        Provider.of<CategoryProvider>(context, listen: true)
                             .danhmucs),
                 Container(
                   height: 8,
@@ -167,6 +167,7 @@ class _HomePageState extends State<HomePage> {
                   onClickTitle: () {
                     showToast("Chưa xây dựng chức năng", Colors.red);
                   },
+                  reversed: true,
                 ),
                 Container(
                   height: 8,
@@ -269,8 +270,7 @@ class _HomePageState extends State<HomePage> {
                                         Container(
                                           margin: const EdgeInsets.only(top: 8),
                                           child: Text(
-                                            value.sanphams[index].gia
-                                                .toString(),
+                                            "${value.sanphams[index].gia}k vnđ",
                                           ),
                                         ),
                                       ],
@@ -305,12 +305,14 @@ class viewProductHorizontal extends StatelessWidget {
   final List products;
   final String title;
   final Function? onClickTitle;
+  final bool? reversed;
 
   const viewProductHorizontal({
     super.key,
     required this.products,
     required this.title,
     this.onClickTitle,
+    this.reversed,
   });
 
   @override
@@ -353,6 +355,7 @@ class viewProductHorizontal extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               itemCount: products.length,
               itemBuilder: (context, index) {
+                final reversedIndex = products.length - 1 - index;
                 return Container(
                   margin: const EdgeInsets.all(8),
                   child: InkWell(
@@ -360,7 +363,9 @@ class viewProductHorizontal extends StatelessWidget {
                       pushScreen(
                         context,
                         DetailScreen(
-                            sanphams: products[index], saleOrEdit: true),
+                            sanphams: products[
+                                reversed ?? false ? reversedIndex : index],
+                            saleOrEdit: true),
                       );
                     },
                     child: Column(
@@ -376,7 +381,7 @@ class viewProductHorizontal extends StatelessWidget {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
                                 child: Image.network(
-                                  '${dotenv.env["URL_IMAGE"]}${products[index].imageArr[0]}',
+                                  '${dotenv.env["URL_IMAGE"]}${products[reversed ?? false ? reversedIndex : index].imageArr[0]}',
                                   fit: BoxFit.cover,
                                   width: double.infinity,
                                   height: double.infinity,
@@ -406,7 +411,7 @@ class viewProductHorizontal extends StatelessWidget {
                         Container(
                           margin: const EdgeInsets.only(top: 8),
                           child: Text(
-                            "${products[index].gia} vnđ",
+                            "${products[reversed ?? false ? reversedIndex : index].gia}k vnđ",
                           ),
                         ),
                       ],
@@ -448,11 +453,10 @@ class listViewCategory extends StatelessWidget {
         itemBuilder: (context, index) {
           return Column(
             children: [
-              const CircleAvatar(
-                backgroundColor: Colors.white,
+              CircleAvatar(
+                backgroundColor: Colors.blue.withOpacity(0.1),
                 radius: 34,
-                backgroundImage: NetworkImage(
-                    'https://icons.veryicon.com/png/o/construction-tools/engineering-physics-color-icon/electronics.png'),
+                child: Image.network(danhmuc[index].urlImage!),
               ),
               Text(
                 danhmuc[index].tenDanhmuc!,
