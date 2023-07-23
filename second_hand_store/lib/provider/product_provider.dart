@@ -6,10 +6,12 @@ import '../api_services/product_service.dart';
 class ProductProvider extends ChangeNotifier {
   List<SanPham> _sanphams = [];
   List<SanPham> _sanphamWithId = [];
-  bool isLoading = false;
-  int totalPage = 1;
+  List<SanPham> _sanphamSearch = [];
   List<SanPham> get sanphams => _sanphams;
   List<SanPham> get sanphamWithId => _sanphamWithId;
+  List<SanPham> get sanphamSearch => _sanphamSearch;
+  bool isLoading = false;
+  int totalPage = 1;
 
   Future<void> getAllProduct({int? page, int? limit}) async {
     isLoading = true;
@@ -55,11 +57,31 @@ class ProductProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-  // Future<void> getAllProduct(int page) async {
-  //   isLoading = true;
-  //   final response = await ProductService.fetchData(page);
-  //   _sanphams = _sanphams + response;
-  //   isLoading = false;
-  //   notifyListeners();
-  // }
+
+  void clearProductSearch() {
+    _sanphamSearch.clear();
+    notifyListeners();
+  }
+
+  Future<void> searchProduct({String? key}) async {
+    isLoading = true;
+
+    final response = await ProductService.searchData(key: key);
+    // print(response);
+    List<SanPham> itemProduct = [];
+
+    if (response.isNotEmpty) {
+      response["arrImageProduct"].forEach((item) => {
+            itemProduct.add(
+              SanPham.fromJson(item),
+            ),
+          });
+      _sanphamSearch = itemProduct;
+      isLoading = false;
+      notifyListeners();
+    } else {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
 }

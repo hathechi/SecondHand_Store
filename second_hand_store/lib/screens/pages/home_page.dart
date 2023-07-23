@@ -16,6 +16,7 @@ import 'package:second_hand_store/utils/push_screen.dart';
 import 'package:second_hand_store/utils/show_toast.dart';
 
 import '../../provider/category_provider.dart';
+import '../../utils/cache_image.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -232,7 +233,7 @@ class _HomePageState extends State<HomePage> {
                                                 child: ClipRRect(
                                                   borderRadius:
                                                       BorderRadius.circular(10),
-                                                  child: Image.network(
+                                                  child: cacheNetWorkImage(
                                                     '${dotenv.env["URL_IMAGE"]}${value.sanphams[index].imageArr![0]}',
                                                     fit: BoxFit.cover,
                                                     width: double.infinity,
@@ -380,7 +381,7 @@ class viewProductHorizontal extends StatelessWidget {
                               height: 200,
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
-                                child: Image.network(
+                                child: cacheNetWorkImage(
                                   '${dotenv.env["URL_IMAGE"]}${products[reversed ?? false ? reversedIndex : index].imageArr[0]}',
                                   fit: BoxFit.cover,
                                   width: double.infinity,
@@ -456,7 +457,7 @@ class listViewCategory extends StatelessWidget {
               CircleAvatar(
                 backgroundColor: Colors.blue.withOpacity(0.1),
                 radius: 34,
-                child: Image.network(danhmuc[index].urlImage!),
+                child: cacheNetWorkImage(danhmuc[index].urlImage!),
               ),
               Text(
                 danhmuc[index].tenDanhmuc!,
@@ -493,7 +494,7 @@ class listViewSale extends StatelessWidget {
           ),
           child: ClipRRect(
             borderRadius: const BorderRadius.all(Radius.circular(10)),
-            child: Image.network(
+            child: cacheNetWorkImage(
               listImageSale[itemIndex],
               fit: BoxFit.cover,
               width: MediaQuery.of(context).size.width * 0.8,

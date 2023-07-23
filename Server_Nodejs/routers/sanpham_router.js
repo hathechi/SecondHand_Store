@@ -7,6 +7,7 @@ import upload from '../controllers/upload_image.js';
 // router.get('/api/sanpham', sanpham_controller.getAllData);
 router.get('/api/sanpham/user', sanpham_controller.getByID);
 router.get('/api/sanpham', sanpham_controller.getPage);
+router.get('/api/search/sanpham', sanpham_controller.searchProduct);
 router.post('/api/sanpham', sanpham_controller.insertData)
 router.put('/api/sanpham', sanpham_controller.updateData)
 router.delete('/api/sanpham', sanpham_controller.deleteData)

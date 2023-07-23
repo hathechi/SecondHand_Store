@@ -88,4 +88,22 @@ class ProductService {
       return false;
     }
   }
+
+  static Future searchData({String? key}) async {
+    final response = await http.get(
+      Uri.parse(
+          'http://${dotenv.env["IPV4"]}:${dotenv.env["PORT"]}/api/search/sanpham?keywork=$key'),
+      headers: {"Content-Type": "application/json"},
+    );
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+
+      log(jsonResponse.toString());
+
+      return jsonResponse;
+    } else {
+      return {};
+    }
+  }
 }

@@ -13,7 +13,7 @@ const getAllData = async (req, res) => {
         // Kiểm tra xem dữ liệu có tồn tại trong cache không
         const cachedData = cache.get(cache_danhmuc_Key);
         if (cachedData) {
-            console.log('Trả về dữ liệu từ cache', cachedData);
+            // console.log('Trả về dữ liệu từ cache', cachedData);
             res.json(cachedData);
 
         } else {

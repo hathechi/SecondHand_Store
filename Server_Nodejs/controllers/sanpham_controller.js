@@ -6,6 +6,8 @@ import Image from '../models/image.js'
 import NodeCache from 'node-cache';
 const cache = new NodeCache();
 
+import { Sequelize } from 'sequelize';
+
 
 // const getAllData = async (req, res) => {
 //     let page = !req.query.page ? 1 : req.query.page
@@ -140,7 +142,7 @@ const getPage = async (req, res) => {
 
         let offset = (page - 1) * limit
 
-        const dataAll = await SanPham.findAll({
+        const { count, rows } = await SanPham.findAndCountAll({
             where: { status: 0 },
             include: [
                 {
@@ -156,11 +158,10 @@ const getPage = async (req, res) => {
             limit: limit,
             order: [['id_sanpham', 'DESC']]
         });
-        if (dataAll != null) {
-            let sanphams = (await SanPham.findAll({ where: { status: 0 } })).length;
-            let totalPage = customRound(sanphams / limit);
+        if (rows != null) {
+            let totalPage = customRound(count / limit);
             //dữ liệu trả về khi đã get ArrImage và loại bỏ key không mong muốn
-            const modifiedData = await removeKey(dataAll);
+            const modifiedData = await removeKey(rows);
             const arrImageProduct = await getArrImage(modifiedData);
             res.status(200).json({ "totalPage": totalPage, arrImageProduct })
         } else {
@@ -291,61 +292,47 @@ const deleteData = async (req, res) => {
         throw error
     }
 }
+const searchProduct = async (req, res) => {
+    try {
+        let keywork = req.query.keywork ? req.query.keywork : ''
 
-// import mydb from '../config/connect_mysql.js'
+        const dataAll = await SanPham.findAll({
+            where: {
+                status: 0,
+                ten_sanpham: {
+                    [Sequelize.Op.like]: `%${keywork}%`
+                },
+                // gia: {
+                //     [Sequelize.Op.like]: `%${Number(keywork)}%`
+                // }
+            },
+            include: [
+                {
+                    model: DanhMuc,
+                    attributes: ['ten_danhmuc']
+                },
+                {
+                    model: NguoiDung,
+                    attributes: ['ten']
+                }
+            ],
 
-// //get all
-// const getAll = (req, res) => {
-//     let sql = `SELECT id_sanpham, ten_sanpham,ngay_tao,gio_tao,gia, mo_ta, ten_danhmuc,ten FROM sanpham
-//      INNER JOIN danhmuc ON sanpham.id_danhmuc = danhmuc.id_danhmuc 
-//      INNER JOIN nguoidung on sanpham.id_nguoidung = nguoidung.id_nguoidung ORDER BY id_sanpham DESC`
-//     // let sql = 'SELECT * FROM `sanpham`'
-//     mydb.query(sql, function (err, result) {
-//         if (err) throw err;
-//         res.json(result)
-//     });
-// };
-// //get by id
-// const getByID = (req, res) => {
-//     let sql = 'SELECT * FROM `sanpham` WHERE id_sanpham = ' + req.params.id
-//     mydb.query(sql, function (err, result) {
-//         if (err) throw err;
-//         res.json(result)
-//     });
-// }
-// //get page
-// const getPage = (req, res) => {
-//     let row_count = 5;
-//     let offset = (req.params.page - 1) * row_count
-//     let sql = `SELECT id_sanpham, ten_sanpham,ngay_tao,gio_tao,gia, mo_ta, ten_danhmuc,ten FROM sanpham
-//      INNER JOIN danhmuc ON sanpham.id_danhmuc = danhmuc.id_danhmuc 
-//      INNER JOIN nguoidung on sanpham.id_nguoidung = nguoidung.id_nguoidung ORDER BY id_sanpham DESC LIMIT ${offset},${row_count}`
-//     mydb.query(sql, function (err, result) {
-//         if (err) throw err;
-//         res.json(result)
-//     });
-// }
+            order: [['id_sanpham', 'DESC']]
+        });
+        if (dataAll != null) {
 
-// //insert sản phẩm
-// const insertSanpham = (req, res) => {
-//     let sql = `INSERT INTO sanpham(ten_sanpham, id_nguoidung, id_danhmuc, ngay_tao, gio_tao, gia, mo_ta)
-//      VALUES ("${req.body.ten_sanpham}",${req.body.id_nguoidung},${req.body.id_danhmuc},"${req.body.ngay_tao}","${req.body.gio_tao}",${req.body.gia},"${req.body.mo_ta}")`
-//     mydb.query(sql, function (err, result) {
-//         if (err) throw err;
-//         res.status(200).json({ status: true, message: 'Insert success' })
-//     });
-// }
-//BODY
-// {
-//     "ten_sanpham": "Iphone cũ",
-//         "id_nguoidung": 2,
-//             "id_danhmuc": 4,
-//                 "ngay_tao": "2023-03-28",
-//                     "gio_tao": "05:56:20",
-//                         "gia": 12.444,
-//                             "mo_ta": "Đẹp vl"
-// }
-
+            //dữ liệu trả về khi đã get ArrImage và loại bỏ key không mong muốn
+            const modifiedData = await removeKey(dataAll);
+            const arrImageProduct = await getArrImage(modifiedData);
+            res.status(200).json({ arrImageProduct })
+        } else {
+            res.status(404).json('NO DATA');
+        }
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
 
 //export với nhiều hàm khi sử dụng export default
 const exportObject = {
@@ -354,6 +341,7 @@ const exportObject = {
     getPage,
     insertData,
     updateData,
-    deleteData
+    deleteData,
+    searchProduct
 };
 export default exportObject;
