@@ -60,7 +60,8 @@ class MyApp extends StatelessWidget {
           },
           theme: ThemeData(
               brightness: Brightness.light,
-              fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
+              fontFamily: GoogleFonts.manrope().fontFamily,
+              // fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
               appBarTheme:
                   const AppBarTheme(backgroundColor: Colors.transparent)),
           navigatorObservers: [BotToastNavigatorObserver()],

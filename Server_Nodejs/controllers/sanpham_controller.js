@@ -57,8 +57,8 @@ import { Sequelize } from 'sequelize';
 //     }
 // };
 //loại bỏ các key danhmuc, nguoidung không cần thiết
-const removeKey = (data) => {
-    const modifiedData = data.map(item => {
+const removeKey = async (data) => {
+    const modifiedData = await data.map(item => {
         return {
             //thêm toJson() vào để parse json
             ...item.toJSON(),
@@ -72,7 +72,7 @@ const removeKey = (data) => {
 //Lấy ArrImage theo id_sanpham của các sản phẩm
 const getArrImage = async (modifiedData) => {
     let dataProduct = []
-    if (modifiedData.length > 0) {
+    if (modifiedData != null) {
         //lấy data image của từng sản phẩm bằng cách lặp qua các sản phẩm,dùng id_sanpham lấy các url hình ảnh
         for (let i = 0; i < modifiedData.length; i++) {
             await Image.findAll({ where: { id_sanpham: modifiedData[i].id_sanpham } }).then((image) => {
@@ -294,18 +294,51 @@ const deleteData = async (req, res) => {
 }
 const searchProduct = async (req, res) => {
     try {
-        let keywork = req.query.keywork ? req.query.keywork : ''
+        let { keyword, minPrice, maxPrice } = req.query;
+        console.log(req.query)
+        let conditions = {
+            status: 0,
+            [Sequelize.Op.and]: [], // Tạo điều kiện AND cho các yêu cầu
+        };
+        if (keyword) {
+            if (minPrice !== 'null' && maxPrice !== 'null') {
+                conditions[Sequelize.Op.and].push({
+                    [Sequelize.Op.or]: [
+                        {
+                            ten_sanpham: {
+                                [Sequelize.Op.like]: `%${keyword}%`
+                            },
+                        },
+                        {
+                            '$DanhMuc.ten_danhmuc$': {
+                                [Sequelize.Op.like]: `%${keyword}%`
+                            },
+                        },
+                    ],
+                    gia: {
+                        [Sequelize.Op.between]: [minPrice, maxPrice],
+                    }
+                });
+            } else {
+                conditions[Sequelize.Op.and].push({
+                    [Sequelize.Op.or]: [
+                        {
+                            ten_sanpham: {
+                                [Sequelize.Op.like]: `%${keyword}%`
+                            },
+                        },
+                        {
+                            '$DanhMuc.ten_danhmuc$': {
+                                [Sequelize.Op.like]: `%${keyword}%`
+                            },
+                        },
+                    ],
+                });
+            }
+        }
 
         const dataAll = await SanPham.findAll({
-            where: {
-                status: 0,
-                ten_sanpham: {
-                    [Sequelize.Op.like]: `%${keywork}%`
-                },
-                // gia: {
-                //     [Sequelize.Op.like]: `%${Number(keywork)}%`
-                // }
-            },
+            where: conditions,
             include: [
                 {
                     model: DanhMuc,

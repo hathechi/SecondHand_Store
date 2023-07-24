@@ -89,10 +89,11 @@ class ProductService {
     }
   }
 
-  static Future searchData({String? key}) async {
+  static Future searchData(
+      {String? key, double? minPrice, double? maxPrice}) async {
     final response = await http.get(
       Uri.parse(
-          'http://${dotenv.env["IPV4"]}:${dotenv.env["PORT"]}/api/search/sanpham?keywork=$key'),
+          'http://${dotenv.env["IPV4"]}:${dotenv.env["PORT"]}/api/search/sanpham?keyword=$key&minPrice=$minPrice&maxPrice=$maxPrice'),
       headers: {"Content-Type": "application/json"},
     );
 

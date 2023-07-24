@@ -63,10 +63,13 @@ class ProductProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> searchProduct({String? key}) async {
+  Future<void> searchProduct(
+      {String? key, double? minPrice, double? maxPrice}) async {
     isLoading = true;
 
-    final response = await ProductService.searchData(key: key);
+    final response = await ProductService.searchData(
+        key: key, minPrice: minPrice, maxPrice: maxPrice);
+
     // print(response);
     List<SanPham> itemProduct = [];
 

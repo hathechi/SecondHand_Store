@@ -69,6 +69,8 @@ dependencies:
   #cache image
   cached_network_image: ^3.2.3
 
+  flutter_xlider: ^3.5.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

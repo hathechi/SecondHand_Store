@@ -24,8 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Widget> _buildScreens(BuildContext context) {
     return [
-      const HomePage(),
       const SearchPage(),
+      const HomePage(),
       // const AddProduct(),
       const FeedPage(),
       Builder(
