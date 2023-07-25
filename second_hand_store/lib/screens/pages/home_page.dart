@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:provider/provider.dart';
 import 'package:second_hand_store/models/danhmuc.dart';
 import 'package:second_hand_store/provider/product_provider.dart';
@@ -19,7 +20,8 @@ import '../../provider/category_provider.dart';
 import '../../utils/cache_image.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, this.controller});
+  final PersistentTabController? controller;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -105,13 +107,12 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
               onPressed: () {
-                showSnackbar(context, "Chức năng đang phát triển!",
-                    const Color.fromARGB(255, 9, 177, 104));
+                widget.controller!.jumpToTab(2);
               },
               icon: const Icon(
-                CupertinoIcons.bag,
+                CupertinoIcons.captions_bubble,
                 color: Colors.black,
-                size: 28,
+                size: 26,
               ),
             ),
           ),
@@ -140,6 +141,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 listViewSale(listImageSale: listImageSale),
                 listViewCategory(
+                    controller: widget.controller!,
                     danhmuc:
                         Provider.of<CategoryProvider>(context, listen: true)
                             .danhmucs),
@@ -432,9 +434,11 @@ class listViewCategory extends StatelessWidget {
   const listViewCategory({
     super.key,
     required this.danhmuc,
+    this.controller,
   });
 
   final List<DanhMuc> danhmuc;
+  final PersistentTabController? controller;
 
   @override
   Widget build(BuildContext context) {
@@ -452,17 +456,22 @@ class listViewCategory extends StatelessWidget {
         ),
         itemCount: danhmuc.length,
         itemBuilder: (context, index) {
-          return Column(
-            children: [
-              CircleAvatar(
-                backgroundColor: Colors.blue.withOpacity(0.1),
-                radius: 34,
-                child: cacheNetWorkImage(danhmuc[index].urlImage!),
-              ),
-              Text(
-                danhmuc[index].tenDanhmuc!,
-              ),
-            ],
+          return InkWell(
+            onTap: () {
+              controller!.jumpToTab(1);
+            },
+            child: Column(
+              children: [
+                CircleAvatar(
+                  backgroundColor: Colors.blue.withOpacity(0.1),
+                  radius: 34,
+                  child: cacheNetWorkImage(danhmuc[index].urlImage!),
+                ),
+                Text(
+                  danhmuc[index].tenDanhmuc!,
+                ),
+              ],
+            ),
           );
         },
       ),

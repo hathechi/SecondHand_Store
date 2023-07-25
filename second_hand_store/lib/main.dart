@@ -59,11 +59,11 @@ class MyApp extends StatelessWidget {
             return child;
           },
           theme: ThemeData(
-              brightness: Brightness.light,
-              fontFamily: GoogleFonts.manrope().fontFamily,
-              // fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
-              appBarTheme:
-                  const AppBarTheme(backgroundColor: Colors.transparent)),
+            brightness: Brightness.light,
+            fontFamily: GoogleFonts.manrope().fontFamily,
+            // fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
+            appBarTheme: const AppBarTheme(backgroundColor: Colors.transparent),
+          ),
           navigatorObservers: [BotToastNavigatorObserver()],
           debugShowCheckedModeBanner: false,
           home: Stack(alignment: Alignment.center, children: [

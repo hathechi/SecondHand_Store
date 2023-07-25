@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:second_hand_store/provider/google_signin.dart';
 import 'package:second_hand_store/provider/product_provider.dart';
 import 'package:second_hand_store/screens/add_product.dart';
+import 'package:second_hand_store/utils/cache_image.dart';
 import 'package:second_hand_store/utils/push_screen.dart';
 import 'package:second_hand_store/utils/shared_preferences.dart';
 
@@ -275,7 +276,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 child: ClipRRect(
                                                   borderRadius:
                                                       BorderRadius.circular(5),
-                                                  child: Image.network(
+                                                  child: cacheNetWorkImage(
                                                     '${dotenv.env["URL_IMAGE"]}${value.sanphamWithId[index].imageArr![0]}',
                                                     fit: BoxFit.cover,
                                                     width: double.infinity,

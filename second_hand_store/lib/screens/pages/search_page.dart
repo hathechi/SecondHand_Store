@@ -301,6 +301,8 @@ void _showBottomSheet(BuildContext context, String key) {
                     //tìm kiếm theo khoảng giá với keyword
                     provider.searchProduct(
                         key: key, minPrice: lower, maxPrice: upper);
+                    hideKeyboard();
+                    pop(context);
                   },
                   child: const Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
