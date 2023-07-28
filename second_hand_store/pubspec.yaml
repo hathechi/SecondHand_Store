@@ -68,6 +68,11 @@ dependencies:
   cached_network_image: ^3.2.3
   flutter_xlider: ^3.5.0
   buttons_tabbar: ^1.3.7+1
+  #socket.io
+  socket_io_client: ^2.0.2
+  #hiệu ứng tỏa của icon
+  avatar_glow: ^2.0.2
+  speech_to_text: ^6.3.0
 
 dev_dependencies:
   flutter_test:

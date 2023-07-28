@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
+import '../../api_services/socket.io_service.dart';
+
 class NotificationTab extends StatefulWidget {
   const NotificationTab({super.key});
 

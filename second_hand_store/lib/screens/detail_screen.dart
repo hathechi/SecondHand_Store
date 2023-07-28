@@ -11,9 +11,12 @@ import 'package:second_hand_store/models/sanpham.dart';
 import 'package:second_hand_store/provider/google_signin.dart';
 import 'package:second_hand_store/screens/add_product.dart';
 import 'package:second_hand_store/screens/pages/profile_page.dart';
+import 'package:second_hand_store/screens/room_chat_screen.dart';
 import 'package:second_hand_store/utils/push_screen.dart';
 import 'package:second_hand_store/utils/show_toast.dart';
 
+import '../api_services/socket.io_service.dart';
+import '../utils/shared_preferences.dart';
 import '../utils/show_bottom_sheet.dart';
 
 // ignore: must_be_immutable
@@ -207,36 +210,69 @@ class DetailScreen extends StatelessWidget {
               visible: saleOrEdit!,
               child: Container(
                 width: double.infinity,
-                height: 60,
                 margin: const EdgeInsets.symmetric(horizontal: 40),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                child: Row(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 16),
+                      child: IconButton(
+                        onPressed: () async {
+                          var userId = await getFromLocalStorage('user');
+                          // ignore: use_build_context_synchronously
+                          SocketService.saveConversationToDatabase(
+                              nguoigui: userId['id_nguoidung'],
+                              nguoinhan: sanphams.idNguoidung!);
+                          // ignore: use_build_context_synchronously
+                          pushScreen(
+                              context,
+                              RoomChatScreen(
+                                id_nguoinhan: sanphams.idNguoidung!,
+                              ));
+                        },
+                        icon: const Icon(
+                          CupertinoIcons.captions_bubble,
+                          size: 34,
+                        ),
+                      ),
                     ),
-                  ),
-                  onPressed: () {
-                    showSnackbar(
-                        context, 'Chức năng chưa phát triển', Colors.red);
-                  },
-                  child: const Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Liên hệ người bán',
-                        style: TextStyle(fontSize: 16),
+                    Expanded(
+                      child: SizedBox(
+                        height: 54,
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5)),
+                            ),
+                          ),
+                          onPressed: () {
+                            showSnackbar(context, 'Chức năng chưa phát triển',
+                                Colors.red);
+                          },
+                          child: const Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Liên hệ người bán',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              SizedBox(
+                                width: 8,
+                              ),
+                              Icon(
+                                CupertinoIcons.chevron_right_2,
+                                color: Colors.white,
+                              )
+                            ],
+                          ),
+                        ),
                       ),
-                      SizedBox(
-                        width: 8,
-                      ),
-                      Icon(
-                        CupertinoIcons.chevron_right_2,
-                        color: Colors.white,
-                      )
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),

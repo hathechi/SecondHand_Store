@@ -8,7 +8,7 @@ import 'package:second_hand_store/provider/category_provider.dart';
 
 import 'package:second_hand_store/provider/google_signin.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:second_hand_store/provider/hide_bottom_nav.dart';
+import 'package:second_hand_store/provider/message_provider.dart';
 import 'package:second_hand_store/provider/product_provider.dart';
 
 import 'package:second_hand_store/screens/splash_screen.dart';
@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
           create: (context) => CategoryProvider(),
         ),
         ChangeNotifierProvider(
-          create: (context) => HideBottomNavProvider(),
+          create: (context) => MessageProvider(),
         ),
 
         //Something
@@ -75,10 +75,13 @@ class MyApp extends StatelessWidget {
                   Provider.of<ProductProvider>(context, listen: true);
               final providerCategory =
                   Provider.of<CategoryProvider>(context, listen: true);
+              final providerMessage =
+                  Provider.of<MessageProvider>(context, listen: true);
 
               return providerGoogle.isLoading ||
                       providerProduct.isLoading ||
-                      providerCategory.isLoading
+                      providerCategory.isLoading ||
+                      providerMessage.isLoading
                   ? Container(
                       color: Colors.transparent,
                       child: const CircularProgressIndicator(

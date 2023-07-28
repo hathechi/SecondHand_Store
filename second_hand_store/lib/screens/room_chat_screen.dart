@@ -1,28 +1,51 @@
+import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:second_hand_store/api_services/socket.io_service.dart';
+import 'package:second_hand_store/provider/message_provider.dart';
 import 'package:second_hand_store/utils/push_screen.dart';
+import 'package:second_hand_store/utils/shared_preferences.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 
 class RoomChatScreen extends StatefulWidget {
-  const RoomChatScreen({super.key});
-
+  RoomChatScreen({super.key, this.id_nguoinhan, this.data_nguoinhan});
+  int? id_nguoinhan;
+  var data_nguoinhan;
   @override
   State<RoomChatScreen> createState() => _RoomChatScreenState();
 }
 
 class _RoomChatScreenState extends State<RoomChatScreen> {
   final _controllerSend = TextEditingController();
-  List<Message> messages = [
-    Message(isSentByMe: true, content: 'Hello there! How are you?'),
-    Message(isSentByMe: false, content: 'Hi! I am doing well. How about you?'),
-    Message(
-        isSentByMe: true,
-        content:
-            'I am good too. Just working on a Flutter project. It\'s fun! . I am good too. Just working on a Flutter project'),
-    Message(
-        isSentByMe: false,
-        content: 'That\'s great! Flutter is really awesome.'),
-    // Add more messages here
-  ];
+
+  //speechtotext
+  final SpeechToText _speechToText = SpeechToText();
+  final bool _speechEnabled = false;
+  final String _lastWords = '';
+  bool isListening = false;
+
+  void getMessage(BuildContext context) async {
+    var userId = await getFromLocalStorage('user');
+    // ignore: use_build_context_synchronously
+    await SocketService.getChatHistory(
+        nguoigui: userId['id_nguoidung'],
+        nguoinhan: widget.id_nguoinhan,
+        context: context);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getMessage(context);
+  }
+
+  @override
+  void dispose() {
+    SocketService.disconnectFromServer();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,18 +61,19 @@ class _RoomChatScreenState extends State<RoomChatScreen> {
             size: 28,
           ),
         ),
-        title: const Row(
+        title: Row(
           children: [
             CircleAvatar(
               radius: 16,
-              backgroundImage: AssetImage('assets/images/avatar.png'),
+              backgroundImage:
+                  NetworkImage(widget.data_nguoinhan['url_avatar']),
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
             Text(
-              'Uncle K',
-              style: TextStyle(
+              widget.data_nguoinhan['ten'],
+              style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                   fontSize: 14),
@@ -65,18 +89,22 @@ class _RoomChatScreenState extends State<RoomChatScreen> {
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: messages.length,
-                  itemBuilder: (context, index) {
-                    final message = messages[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: ChatMessage(
-                        isSentByMe: message.isSentByMe,
-                        content: message.content,
-                      ),
+                child: Consumer<MessageProvider>(
+                  builder: (context, value, child) {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: value.listMessage.length,
+                      itemBuilder: (context, index) {
+                        final message = value.listMessage[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: ChatMessage(
+                            isSentByMe: message.isSentByMe,
+                            content: message.content,
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
@@ -93,20 +121,61 @@ class _RoomChatScreenState extends State<RoomChatScreen> {
                         onPressed: () {},
                         icon: const Icon(CupertinoIcons.photo),
                       ),
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(CupertinoIcons.camera),
+                      InkWell(
+                        onTap: () async {
+                          if (!isListening) {
+                            var available = await _speechToText.initialize();
+                            if (available) {
+                              setState(() {
+                                isListening = true;
+                                _speechToText.listen(
+                                  onResult: (result) {
+                                    setState(() {
+                                      _controllerSend.text =
+                                          result.recognizedWords;
+                                    });
+                                  },
+                                );
+                              });
+                            }
+                          } else {
+                            setState(() {
+                              isListening = false;
+                            });
+                            _speechToText.stop();
+                          }
+                        },
+                        child: AvatarGlow(
+                          shape: BoxShape.circle,
+                          glowColor: Colors.blue,
+                          endRadius: 25,
+                          duration: const Duration(milliseconds: 2000),
+                          repeat: true,
+                          animate: isListening,
+                          showTwoGlows: true,
+                          repeatPauseDuration:
+                              const Duration(milliseconds: 100),
+                          child: !isListening
+                              ? const Icon(CupertinoIcons.mic)
+                              : const Icon(
+                                  CupertinoIcons.mic_circle_fill,
+                                  color: Colors.blue,
+                                ),
+                        ),
                       ),
                     ],
                   ),
                   Expanded(
                       child: inputSend(
                     controllerSend: _controllerSend,
-                    onTap: () {
-                      setState(() {
-                        messages.add(Message(
-                            isSentByMe: true, content: _controllerSend.text));
-                      });
+                    onTap: () async {
+                      var userId = await getFromLocalStorage('user');
+                      // ignore: use_build_context_synchronously
+                      SocketService.sendMessage(
+                          content: _controllerSend.text,
+                          nguoigui: userId['id_nguoidung'],
+                          nguoinhan: widget.id_nguoinhan!,
+                          context: context);
                       _controllerSend.clear();
                     },
                   )),

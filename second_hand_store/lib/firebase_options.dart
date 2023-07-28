@@ -70,7 +70,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '349930269675',
     projectId: 'second-hand-store-e2539',
     storageBucket: 'second-hand-store-e2539.appspot.com',
-    iosClientId: '349930269675-e57v1ipaqrt5dg6q8b31hilq3oo01en8.apps.googleusercontent.com',
+    iosClientId:
+        '349930269675-e57v1ipaqrt5dg6q8b31hilq3oo01en8.apps.googleusercontent.com',
     iosBundleId: 'com.example.secondHandStore',
   );
 }

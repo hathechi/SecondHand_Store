@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:provider/provider.dart';
-import 'package:second_hand_store/provider/hide_bottom_nav.dart';
+
 import 'package:second_hand_store/screens/pages/home_page.dart';
 import 'package:second_hand_store/screens/pages/message_page.dart';
 import 'package:second_hand_store/screens/pages/login_page.dart';
@@ -84,12 +84,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final hideBottomNavProvider =
-        Provider.of<HideBottomNavProvider>(context, listen: true);
     return WillPopScope(
       onWillPop: () async => true,
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
         body: PersistentTabView(
           context,
           controller: _controller,
@@ -123,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
             duration: Duration(milliseconds: 200),
           ),
           //lắng nghe yêu cầu ẩn hiện thanh bottom nav
-          hideNavigationBar: hideBottomNavProvider.hideBottomNavigationBar,
+          // hideNavigationBar: hideBottomNavProvider.hideBottomNavigationBar,
           navBarStyle: NavBarStyle
               .style12, // Choose the nav bar style with this property.
         ),
