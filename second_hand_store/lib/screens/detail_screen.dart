@@ -14,20 +14,41 @@ import 'package:second_hand_store/screens/pages/profile_page.dart';
 import 'package:second_hand_store/screens/room_chat_screen.dart';
 import 'package:second_hand_store/utils/push_screen.dart';
 import 'package:second_hand_store/utils/show_toast.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../api_services/socket.io_service.dart';
 import '../utils/shared_preferences.dart';
 import '../utils/show_bottom_sheet.dart';
 
 // ignore: must_be_immutable
-class DetailScreen extends StatelessWidget {
-  const DetailScreen(
-      {super.key, required this.sanphams, required this.saleOrEdit});
+class DetailScreen extends StatefulWidget {
+  DetailScreen({super.key, required this.sanphams, required this.saleOrEdit});
 
   final SanPham sanphams;
 
   //biến kiểm tra xem người dùng đến từ trang home hay trang chỉnh sửa
-  final bool? saleOrEdit;
+  late bool? saleOrEdit;
+
+  @override
+  State<DetailScreen> createState() => _DetailScreenState();
+}
+
+class _DetailScreenState extends State<DetailScreen> {
+  //Kiểm tra xem mặt hàng này có phải cho người dùng đang đăng nhập đăng bán hay không? Nếu đúng thì ẩn phần liên hệ
+  void checkUserisTheSeller() async {
+    var userId = await getFromLocalStorage('user');
+    if (userId['id_nguoidung'] == widget.sanphams.idNguoidung) {
+      setState(() {
+        widget.saleOrEdit = false;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkUserisTheSeller();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +65,7 @@ class DetailScreen extends StatelessWidget {
                       width: double.infinity,
                       height: MediaQuery.sizeOf(context).height * 0.45,
                       child: imageSlider(
-                        arrImage: sanphams.imageArr!,
+                        arrImage: widget.sanphams.imageArr!,
                         onClickBack: () {
                           Navigator.of(context).pop();
                         },
@@ -73,7 +94,7 @@ class DetailScreen extends StatelessWidget {
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        sanphams.nguoidung!,
+                                        widget.sanphams.nguoidung!,
                                         style: const TextStyle(
                                             fontWeight: FontWeight.bold),
                                         overflow: TextOverflow.ellipsis,
@@ -83,13 +104,14 @@ class DetailScreen extends StatelessWidget {
                                 ),
                               ),
                               Visibility(
-                                visible: !saleOrEdit!,
+                                visible: !widget.saleOrEdit!,
                                 child: Expanded(
                                   child: Align(
                                     alignment: Alignment.centerRight,
                                     child: IconButton(
                                       onPressed: () {
-                                        _showBottomSheet(context, sanphams);
+                                        _showBottomSheet(
+                                            context, widget.sanphams);
                                       },
                                       icon: const Icon(
                                         CupertinoIcons.ellipsis_vertical,
@@ -104,7 +126,7 @@ class DetailScreen extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(top: 20),
                             child: Text(
-                              sanphams.tenSanpham!,
+                              widget.sanphams.tenSanpham!,
                               style: const TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
@@ -119,7 +141,7 @@ class DetailScreen extends StatelessWidget {
                                   ),
                                   children: [
                                     TextSpan(
-                                      text: "${sanphams.gia}k vnđ",
+                                      text: "${widget.sanphams.gia}k vnđ",
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16),
@@ -137,7 +159,7 @@ class DetailScreen extends StatelessWidget {
                                   ),
                                   children: [
                                     TextSpan(
-                                      text: sanphams.danhmuc,
+                                      text: widget.sanphams.danhmuc,
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16),
@@ -155,7 +177,7 @@ class DetailScreen extends StatelessWidget {
                                   ),
                                   children: [
                                     TextSpan(
-                                      text: sanphams.sdt,
+                                      text: widget.sanphams.sdt,
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16),
@@ -173,7 +195,7 @@ class DetailScreen extends StatelessWidget {
                                   ),
                                   children: [
                                     TextSpan(
-                                      text: sanphams.diachi,
+                                      text: widget.sanphams.diachi,
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16),
@@ -191,7 +213,7 @@ class DetailScreen extends StatelessWidget {
                                   ),
                                   children: [
                                     TextSpan(
-                                      text: "${sanphams.moTa}",
+                                      text: "${widget.sanphams.moTa}",
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16),
@@ -207,7 +229,7 @@ class DetailScreen extends StatelessWidget {
               ),
             ),
             Visibility(
-              visible: saleOrEdit!,
+              visible: widget.saleOrEdit!,
               child: Container(
                 width: double.infinity,
                 margin: const EdgeInsets.symmetric(horizontal: 40),
@@ -222,13 +244,14 @@ class DetailScreen extends StatelessWidget {
                           // ignore: use_build_context_synchronously
                           SocketService.saveConversationToDatabase(
                               nguoigui: userId['id_nguoidung'],
-                              nguoinhan: sanphams.idNguoidung!);
+                              nguoinhan: widget.sanphams.idNguoidung!);
                           // ignore: use_build_context_synchronously
                           pushScreen(
-                              context,
-                              RoomChatScreen(
-                                id_nguoinhan: sanphams.idNguoidung!,
-                              ));
+                            context,
+                            RoomChatScreen(
+                                id_nguoinhan: widget.sanphams.idNguoidung!,
+                                ten_nguoinhan: widget.sanphams.nguoidung!),
+                          );
                         },
                         icon: const Icon(
                           CupertinoIcons.captions_bubble,
@@ -249,8 +272,7 @@ class DetailScreen extends StatelessWidget {
                             ),
                           ),
                           onPressed: () {
-                            showSnackbar(context, 'Chức năng chưa phát triển',
-                                Colors.red);
+                            _makePhoneCall(widget.sanphams.sdt!);
                           },
                           child: const Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -284,6 +306,14 @@ class DetailScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<void> _makePhoneCall(String phoneNumber) async {
+  final Uri launchUri = Uri(
+    scheme: 'tel',
+    path: phoneNumber,
+  );
+  await launchUrl(launchUri);
 }
 
 void _showBottomSheet(BuildContext context, SanPham sanphams) {

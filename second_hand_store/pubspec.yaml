@@ -73,6 +73,8 @@ dependencies:
   #hiệu ứng tỏa của icon
   avatar_glow: ^2.0.2
   speech_to_text: ^6.3.0
+  #chuyển hướng ứng dụng 
+  url_launcher: ^6.1.12
 
 dev_dependencies:
   flutter_test:

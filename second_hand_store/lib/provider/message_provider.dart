@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
-
-import '../screens/room_chat_screen.dart';
+import '../models/message.dart';
 
 class MessageProvider extends ChangeNotifier {
   bool isLoading = false;

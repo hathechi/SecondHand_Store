@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,10 +10,15 @@ import 'package:second_hand_store/utils/push_screen.dart';
 import 'package:second_hand_store/utils/shared_preferences.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
+import '../utils/show_bottom_sheet.dart';
+import '../utils/show_toast.dart';
+
 class RoomChatScreen extends StatefulWidget {
-  RoomChatScreen({super.key, this.id_nguoinhan, this.data_nguoinhan});
+  RoomChatScreen(
+      {super.key, this.id_nguoinhan, this.data_nguoinhan, this.ten_nguoinhan});
   int? id_nguoinhan;
   var data_nguoinhan;
+  String? ten_nguoinhan;
   @override
   State<RoomChatScreen> createState() => _RoomChatScreenState();
 }
@@ -63,21 +70,34 @@ class _RoomChatScreenState extends State<RoomChatScreen> {
         ),
         title: Row(
           children: [
-            CircleAvatar(
-              radius: 16,
-              backgroundImage:
-                  NetworkImage(widget.data_nguoinhan['url_avatar']),
-            ),
+            widget.data_nguoinhan != null
+                ? CircleAvatar(
+                    radius: 16,
+                    backgroundImage:
+                        NetworkImage(widget.data_nguoinhan['url_avatar']),
+                  )
+                : const CircleAvatar(
+                    radius: 16,
+                    backgroundImage: AssetImage('assets/images/avatar.png'),
+                  ),
             const SizedBox(
               width: 10,
             ),
-            Text(
-              widget.data_nguoinhan['ten'],
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  fontSize: 14),
-            ),
+            widget.data_nguoinhan != null
+                ? Text(
+                    widget.data_nguoinhan['ten'],
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        fontSize: 14),
+                  )
+                : Text(
+                    widget.ten_nguoinhan!,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        fontSize: 14),
+                  ),
           ],
         ),
       ),
@@ -100,9 +120,10 @@ class _RoomChatScreenState extends State<RoomChatScreen> {
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           child: ChatMessage(
-                            isSentByMe: message.isSentByMe,
-                            content: message.content,
-                          ),
+                              isSentByMe: message.isSentByMe,
+                              content: message.content,
+                              id_message: message.id_message,
+                              index: index),
                         );
                       },
                     );
@@ -192,9 +213,15 @@ class _RoomChatScreenState extends State<RoomChatScreen> {
 class ChatMessage extends StatelessWidget {
   final bool isSentByMe;
   final String content;
+  final int id_message;
+  final int index;
 
   const ChatMessage(
-      {super.key, required this.isSentByMe, required this.content});
+      {super.key,
+      required this.isSentByMe,
+      required this.content,
+      required this.id_message,
+      required this.index});
 
   @override
   Widget build(BuildContext context) {
@@ -217,32 +244,126 @@ class ChatMessage extends StatelessWidget {
             child: Container(
               alignment:
                   isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: isSentByMe
-                      ? const Color.fromARGB(255, 91, 200, 194)
-                      : Colors.grey.withOpacity(0.1),
-                  borderRadius: isSentByMe
-                      ? const BorderRadius.only(
-                          topLeft: Radius.circular(10),
-                          topRight: Radius.circular(10),
-                          bottomLeft: Radius.circular(10))
-                      : const BorderRadius.only(
-                          topLeft: Radius.circular(10),
-                          topRight: Radius.circular(10),
-                          bottomRight: Radius.circular(10)),
-                ),
-                child: Text(
-                  content,
-                  style: TextStyle(
-                      color: isSentByMe ? Colors.white : Colors.black),
+              child: InkWell(
+                onLongPress: () {
+                  if (isSentByMe) {
+                    showModalBottomSheet(
+                      context: context,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(14),
+                            color: Colors.white,
+                          ),
+                          margin: const EdgeInsets.only(
+                              left: 20, right: 20, bottom: 35),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 20, horizontal: 16),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              btnBottomSheetItem(
+                                icon: const Icon(CupertinoIcons.delete),
+                                title: 'Xóa tin nhắn',
+                                function: () {
+                                  pop(context);
+                                  final provider = Provider.of<MessageProvider>(
+                                      context,
+                                      listen: false);
+                                  dialogModalBottomsheet(context, 'Xóa',
+                                      () async {
+                                    provider.showLoading();
+                                    //Gọi hàm xóa tin nhắn
+                                    SocketService.deleteMessage(
+                                        context, id_message,
+                                        onSuccess: (message) {
+                                      log(message.toString());
+                                      if (message) {
+                                        provider.dismiss();
+                                        //xóa phần tử message ở provider  theo index để hiển thị lên view
+                                        provider.listMessage.removeAt(index);
+                                        // ignore: use_build_context_synchronously
+                                        showToast(
+                                            'Xoá thành công', Colors.green);
+                                      } else {
+                                        provider.dismiss();
+                                        // ignore: use_build_context_synchronously
+                                        showToast('Có lỗi khi xóa', Colors.red);
+                                      }
+                                    });
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  }
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: isSentByMe
+                        ? const Color.fromARGB(255, 91, 200, 194)
+                        : Colors.grey.withOpacity(0.1),
+                    borderRadius: isSentByMe
+                        ? const BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            topRight: Radius.circular(10),
+                            bottomLeft: Radius.circular(10))
+                        : const BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            topRight: Radius.circular(10),
+                            bottomRight: Radius.circular(10)),
+                  ),
+                  child: Text(
+                    content,
+                    style: TextStyle(
+                        color: isSentByMe ? Colors.white : Colors.black),
+                  ),
                 ),
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class btnBottomSheetItem extends StatelessWidget {
+  final Icon icon;
+  final String title;
+  Function? function;
+  btnBottomSheetItem({
+    Key? key,
+    required this.icon,
+    required this.title,
+    this.function,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        function!();
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        width: double.infinity,
+        child: Row(
+          children: [
+            icon,
+            const SizedBox(
+              width: 20,
+            ),
+            Text(title),
+          ],
+        ),
       ),
     );
   }
@@ -354,11 +475,4 @@ class _inputSendState extends State<inputSend> {
       ],
     );
   }
-}
-
-class Message {
-  final bool isSentByMe;
-  final String content;
-
-  Message({required this.isSentByMe, required this.content});
 }

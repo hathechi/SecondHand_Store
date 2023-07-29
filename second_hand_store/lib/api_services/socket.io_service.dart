@@ -5,8 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:second_hand_store/provider/message_provider.dart';
-import 'package:second_hand_store/screens/room_chat_screen.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
+
+import '../models/message.dart';
 
 class SocketService {
   static io.Socket? socket;
@@ -60,15 +61,37 @@ class SocketService {
 
     socket!.on('chat message', (data) {
       if (data['socketId'] == socket!.id) {
-        provider.addMessage(
-            Message(isSentByMe: true, content: data['message']['message']));
+        provider.addMessage(Message(
+          isSentByMe: true,
+          content: data['message']['message'],
+          id_message: int.parse(data['message']['id'].toString()),
+          time: data['message']['timestamp'],
+        ));
         log(data['message']['message'] + " isSentByMe: true");
       } else {
-        provider.addMessage(
-            Message(isSentByMe: false, content: data['message']['message']));
+        provider.addMessage(Message(
+          isSentByMe: false,
+          content: data['message']['message'],
+          id_message: int.parse(data['message']['id'].toString()),
+          time: data['message']['timestamp'],
+        ));
         log(data['message']['message'] + " isSentByMe: false");
       }
     });
+  }
+
+//Sử dụng callback để nhận được giá trị qua bên  gọi hàm
+  static void deleteMessage(BuildContext context, int idMessage,
+      {Function(bool)? onSuccess}) {
+    socket!.emit('delete message', {'id_message': idMessage});
+
+    socket!.on(
+      'delete message',
+      (data) {
+        //parse sang bool từ string trả về
+        onSuccess?.call(bool.parse(data['message'].toString()));
+      },
+    );
   }
 
   static Future<void> getChatHistory(
@@ -91,9 +114,14 @@ class SocketService {
         List<Message> history = [];
 
         (data['message']).forEach((item) => {
-              history.add(Message(
+              history.add(
+                Message(
                   isSentByMe: item['id_nguoigui'] == nguoigui ? true : false,
-                  content: item['message']))
+                  content: item['message'],
+                  id_message: int.parse(item['id'].toString()),
+                  time: item['timestamp'],
+                ),
+              ),
             });
         if (data['socketId'] == socket!.id) {
           provider.listMessage = history;

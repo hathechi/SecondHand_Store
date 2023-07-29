@@ -1,7 +1,8 @@
 import { Server } from 'socket.io';
 const io = new Server();
 
-import { handleMessage, getConversations, getHistoryMessage, saveConversationToDatabase } from '../controllers/socket.io_controller.js'
+import { handleMessage, getConversations, getHistoryMessage, saveConversationToDatabase, deleteMessage } from '../controllers/socket.io_controller.js'
+import Message from '../models/message.js';
 
 io.on('connection', (socket) => {
     console.log('Người dùng đã kết nối:', socket.id);
@@ -10,9 +11,10 @@ io.on('connection', (socket) => {
     socket.on('send message', async (data) => {
         console.log('Tin nhắn mới từ người dùng:', data);
         const socketId_nguoidung = data['socketId'];
-        await handleMessage(data);
+        const newMessage = await handleMessage(data);
+
         // Gửi tin nhắn lại cho tất cả người dùng kết nối
-        io.emit('chat message', { message: data, socketId: socketId_nguoidung });
+        io.emit('chat message', { message: newMessage.toJSON(), socketId: socketId_nguoidung });
     });
 
 
@@ -38,6 +40,21 @@ io.on('connection', (socket) => {
 
         // Gửi tin nhắn lại cho tất cả người dùng kết nối
         io.emit(`get conversation`, { message: message, 'socketId': socketId });
+    });
+
+    //Nhận sự kiện xóa từ client
+    socket.on('delete message', async (data) => {
+        const { id_message } = data;
+
+        let message = await deleteMessage(id_message);
+        //Nếu message trả ra là 1 có nghĩa là 1 bản ghi đã được xóa, 0 có nghĩa là 0 bản ghi nào được xóa hoặc có lỗi
+        // console.log('DELETE: ', message);
+
+        if (message === 1) {
+            io.emit(`delete message`, { message: true });
+        } else {
+            io.emit(`delete message`, { message: false });
+        }
     });
 
 

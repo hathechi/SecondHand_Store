@@ -90,10 +90,10 @@ class _MessageTabState extends State<MessageTab> {
                                   ),
                                 ],
                               ),
-                              const Text(
-                                '30 phút trước',
-                                style: TextStyle(fontSize: 12),
-                              ),
+                              // const Text(
+                              //   '30 phút trước',
+                              //   style: TextStyle(fontSize: 12),
+                              // ),
                             ],
                           ),
                           const SizedBox(
