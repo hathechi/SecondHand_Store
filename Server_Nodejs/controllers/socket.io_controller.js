@@ -31,24 +31,27 @@ async function handleMessage(data) {
 async function saveConversationToDatabase(userId1, userId2) {
     console.log({ userId1, userId2 })
     try {
-        //         `SELECT * FROM Conversation
-        // WHERE (userId1 = 2 AND userId2 = 38)
-        //    OR (userId1 = 38 AND userId2 =2);`
-        const isExist = await Conversation.findAll({
-            where: {
-                [Sequelize.Op.or]: [
-                    {
-                        userId1: userId1,
-                        userId2: userId2,
-                    },
-                    {
-                        userId1: userId2,
-                        userId2: userId2,
-                    }
-                ],
+        const query = `SELECT * FROM conversation
+         WHERE (userId1 = ${userId1} AND userId2 = ${userId2})
+            OR (userId1 = ${userId2} AND userId2 =${userId1});`
+        // const isExist = await Conversation.findAll({
+        //     where: {
+        //         [Sequelize.Op.or]: [
+        //             {
+        //                 userId1: userId1,
+        //                 userId2: userId2,
+        //             },
+        //             {
+        //                 userId1: userId2,
+        //                 userId2: userId2,
+        //             }
+        //         ],
 
-            }
-        })
+        //     }
+        // })
+        const isExist = await Conversation.query(query);
+
+
         console.log(isExist)
         if (userId1 === userId2 || isExist.length > 0) {
             return;
