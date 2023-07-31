@@ -9,7 +9,7 @@ class ProductService {
   static Future<Map<String, dynamic>> fetchData({int? page, int? limit}) async {
     final response = await http.get(
       Uri.parse(
-        "http://${dotenv.env["IPV4"]}:${dotenv.env["PORT"]}/api/sanpham?page=$page&limit=$limit",
+        "${dotenv.env["URL_SERVER"]}/api/sanpham?page=$page&limit=$limit",
       ),
       headers: {"Content-Type": "application/json"},
     );
@@ -26,7 +26,7 @@ class ProductService {
   static Future fetchDataWithID({String? id}) async {
     final response = await http.get(
       Uri.parse(
-        "http://${dotenv.env["IPV4"]}:${dotenv.env["PORT"]}/api/sanpham/user?id=$id",
+        "${dotenv.env["URL_SERVER"]}/api/sanpham/user?id=$id",
       ),
       headers: {"Content-Type": "application/json"},
     );
@@ -43,8 +43,7 @@ class ProductService {
 
   static Future<bool> postData(SanPham sanPham) async {
     final response = await http.post(
-        Uri.parse(
-            'http://${dotenv.env["IPV4"]}:${dotenv.env["PORT"]}/api/sanpham'),
+        Uri.parse('${dotenv.env["URL_SERVER"]}/api/sanpham'),
         headers: {"Content-Type": "application/json"},
         body: json.encode(sanPham));
 
@@ -59,8 +58,7 @@ class ProductService {
 
   static Future<bool> updateData(SanPham sanPham) async {
     final response = await http.put(
-        Uri.parse(
-            'http://${dotenv.env["IPV4"]}:${dotenv.env["PORT"]}/api/sanpham'),
+        Uri.parse('${dotenv.env["URL_SERVER"]}/api/sanpham'),
         headers: {"Content-Type": "application/json"},
         body: json.encode(sanPham));
 
@@ -75,8 +73,7 @@ class ProductService {
 
   static Future<bool> deleteData(int idSanpham) async {
     final response = await http.delete(
-        Uri.parse(
-            'http://${dotenv.env["IPV4"]}:${dotenv.env["PORT"]}/api/sanpham'),
+        Uri.parse('${dotenv.env["URL_SERVER"]}/api/sanpham'),
         headers: {"Content-Type": "application/json"},
         body: json.encode({"id_sanpham": idSanpham}));
 
@@ -93,7 +90,7 @@ class ProductService {
       {String? key, double? minPrice, double? maxPrice}) async {
     final response = await http.get(
       Uri.parse(
-          'http://${dotenv.env["IPV4"]}:${dotenv.env["PORT"]}/api/search/sanpham?keyword=$key&minPrice=$minPrice&maxPrice=$maxPrice'),
+          '${dotenv.env["URL_SERVER"]}/api/search/sanpham?keyword=$key&minPrice=$minPrice&maxPrice=$maxPrice'),
       headers: {"Content-Type": "application/json"},
     );
 

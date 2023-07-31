@@ -93,11 +93,16 @@ async function getConversations(id_nguoidung) {
         //     ],
         // });
 
+        // const query = `SELECT conversation.id, conversation.userId1, conversation.userId2, nguoidung.id_nguoidung, nguoidung.ten, nguoidung.url_avatar
+        //  FROM conversation LEFT JOIN nguoidung ON
+        //  (conversation.userId1 = nguoidung.id_nguoidung AND conversation.userId2 = ${id_nguoidung}) 
+        //  OR(conversation.userId2 = nguoidung.id_nguoidung AND conversation.userId1 = ${id_nguoidung}) 
+        //  WHERE conversation.userId1 = ${id_nguoidung} OR conversation.userId2 = ${id_nguoidung} `;
         const query = `SELECT conversation.id, conversation.userId1, conversation.userId2, nguoidung.id_nguoidung, nguoidung.ten, nguoidung.url_avatar
          FROM conversation LEFT JOIN nguoidung ON
          (conversation.userId1 = nguoidung.id_nguoidung AND conversation.userId2 = ${id_nguoidung}) 
          OR(conversation.userId2 = nguoidung.id_nguoidung AND conversation.userId1 = ${id_nguoidung}) 
-         WHERE conversation.userId1 = ${id_nguoidung} OR conversation.userId2 = ${id_nguoidung} `;
+         WHERE conversation.userId1 = ${id_nguoidung}`;
         // Truy vấn cơ sở dữ liệu để lấy danh sách cuộc trò chuyện
         const conversations = await sequelize.query(query);
 

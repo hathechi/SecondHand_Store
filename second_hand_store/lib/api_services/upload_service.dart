@@ -10,9 +10,7 @@ Future<List<String>> uploadImages(
     List<XFile> imageFiles, BuildContext context) async {
   List<String> urlImageUploads = [];
   var request = http.MultipartRequest(
-      'POST',
-      Uri.parse(
-          'http://${dotenv.env["IPV4"]}:${dotenv.env["PORT"]}/api/upload'));
+      'POST', Uri.parse('${dotenv.env["URL_SERVER"]}/api/upload'));
 
   for (var file in imageFiles) {
     request.files.add(await http.MultipartFile.fromPath(

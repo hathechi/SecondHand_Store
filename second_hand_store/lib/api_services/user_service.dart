@@ -9,8 +9,7 @@ import '../utils/shared_preferences.dart';
 class UserService {
   static Future<void> postData(User user) async {
     var response = await http.post(
-      Uri.parse(
-          'http://${dotenv.env["IPV4"]}:${dotenv.env["PORT"]}/api/nguoidung'),
+      Uri.parse('${dotenv.env["URL_SERVER"]}/api/nguoidung'),
       headers: {"Content-Type": "application/json"},
       body: json.encode(
         {

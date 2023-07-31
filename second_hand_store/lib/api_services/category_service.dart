@@ -7,8 +7,7 @@ import 'package:second_hand_store/models/danhmuc.dart';
 class CategoryService {
   static Future<List<DanhMuc>> fetchData() async {
     final response = await http.get(
-      Uri.parse(
-          'http://${dotenv.env["IPV4"]}:${dotenv.env["PORT"]}/api/danhmuc'),
+      Uri.parse('${dotenv.env["URL_SERVER"]}/api/danhmuc'),
       headers: {"Content-Type": "application/json"},
     );
 
