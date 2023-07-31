@@ -12,7 +12,7 @@ import '../models/message.dart';
 class SocketService {
   static io.Socket? socket;
   // Địa chỉ URL của server Socket.IO
-  static String socketUrl ='${dotenv.env["URL_SERVER"]}';
+  static String socketUrl = '${dotenv.env["URL_SERVER"]}/';
 
   static Future<void> disconnectFromServer() async {
     socket?.dispose();

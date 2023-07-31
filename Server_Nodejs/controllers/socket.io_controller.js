@@ -105,8 +105,9 @@ async function getConversations(id_nguoidung) {
          WHERE conversation.userId1 = ${id_nguoidung}`;
         // Truy vấn cơ sở dữ liệu để lấy danh sách cuộc trò chuyện
         const conversations = await sequelize.query(query);
-
-        return conversations;
+        if (conversations != null) {
+            return conversations;
+        }
     } catch (error) {
         console.error('Lỗi khi lấy danh sách cuộc trò chuyện:', error);
         return [];
@@ -130,6 +131,8 @@ const getHistoryMessage = async (nguoigui, nguoinhan) => {
 
             order: [['timestamp', 'ASC']],
         });
+        // const query = `SELECT id, id_nguoigui, id_nguoinhan, message, timestamp, createdAt, updatedAt FROM message AS message WHERE ((message.id_nguoigui = ${nguoigui} AND message.id_nguoinhan = ${nguoinhan}) OR (message.id_nguoigui = ${nguoinhan} AND message.id_nguoinhan = ${nguoigui})) ORDER BY message.timestamp ASC`
+        // const messages = await Message.query(query);
         return messages;
     } catch (error) {
         console.error('Lỗi khi truy vấn tin nhắn:', error);
