@@ -310,7 +310,7 @@ const searchProduct = async (req, res) => {
                             },
                         },
                         {
-                            '$DanhMuc.ten_danhmuc$': {
+                            '$danhmuc.ten_danhmuc$': {
                                 [Sequelize.Op.like]: `%${keyword}%`
                             },
                         },
