@@ -20,11 +20,11 @@ const sequelize = new Sequelize(process.env.DB_NAME_MYSQL, process.env.DB_USER, 
 
 });
 
-sequelize.sync()
-    .then(() => {
-        console.log('Đã tạo các bảng trong cơ sở dữ liệu.');
-    })
-    .catch((error) => {
-        console.error('Lỗi khi tạo các bảng:', error);
-    });
+// sequelize.sync()
+//     .then(() => {
+//         console.log('Đã tạo các bảng trong cơ sở dữ liệu.');
+//     })
+//     .catch((error) => {
+//         console.error('Lỗi khi tạo các bảng:', error);
+//     });
 export default sequelize;
