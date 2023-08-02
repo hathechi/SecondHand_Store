@@ -404,7 +404,10 @@ class viewProductHorizontal extends StatelessWidget {
                                   ),
                                 ),
                                 child: Text(
-                                  products[index].danhmuc,
+                                  products[reversed ?? false
+                                          ? reversedIndex
+                                          : index]
+                                      .danhmuc,
                                   style: const TextStyle(color: Colors.white),
                                 ),
                               ),

@@ -22,7 +22,7 @@ const SanPham = mydb.define('sanpham', {
         type: DataTypes.INTEGER
     },
     ngay_tao: {
-        type: DataTypes.NUMBER
+        type: DataTypes.INTEGER
     },
 
     gia: {
