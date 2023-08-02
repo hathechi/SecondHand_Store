@@ -284,7 +284,7 @@ const deleteData = async (req, res) => {
                     id_sanpham: req.body.id_sanpham
                 }
             })
-            deleteData ? res.json({ status: true, message: "delete succsess" }) : res.status(404).json({ status: false, message: "delete false" })
+            deleteData != null ? res.json({ status: true, message: "delete succsess" }) : res.status(404).json({ status: false, message: "delete false" })
         } else {
             res.status(404).json({ status: false, message: `id_sanpham ${req.body.id_sanpham} not found` })
         }

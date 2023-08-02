@@ -71,7 +71,7 @@ class ProductService {
     }
   }
 
-  static Future<bool> deleteData(int idSanpham) async {
+  static Future<bool> deleteData(int? idSanpham) async {
     final response = await http.delete(
         Uri.parse('${dotenv.env["URL_SERVER"]}/api/sanpham'),
         headers: {"Content-Type": "application/json"},

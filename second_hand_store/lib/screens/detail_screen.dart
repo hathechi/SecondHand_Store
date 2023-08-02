@@ -356,25 +356,24 @@ void _showBottomSheet(BuildContext context, SanPham sanphams) {
               ),
               title: 'Xóa sản phẩm',
               function: () {
-                pop(context);
-
-                final provider =
-                    Provider.of<GoogleSignInProvider>(context, listen: false);
+                // pop(context); // Khong được đóng màn ở đây, nếu đóng sẽ lỗi vì không còn context
 
                 dialogModalBottomsheet(context, 'Xóa', () async {
+                  final provider =
+                      Provider.of<GoogleSignInProvider>(context, listen: false);
                   provider.showLoading();
-                  final delete =
-                      await ProductService.deleteData(sanphams.idSanpham!);
+                  bool? delete =
+                      await ProductService.deleteData(sanphams.idSanpham);
                   if (delete) {
-                    // ignore: use_build_context_synchronously
-                    showSnackbar(context, 'Xoá thành công', Colors.green);
                     provider.dismiss();
                     // ignore: use_build_context_synchronously
-                    pushReplacement(context, const ProfilePage());
+                    showToast('Xoá thành công', Colors.green);
+                    // ignore: use_build_context_synchronously
+                    pushAndRemoveUntil(context, const ProfilePage());
                   } else {
                     provider.dismiss();
                     // ignore: use_build_context_synchronously
-                    showSnackbar(context, 'Xoá không thành công', Colors.red);
+                    showToast('Xoá không thành công', Colors.red);
                   }
                 });
               },

@@ -53,60 +53,66 @@ class _MessageTabState extends State<MessageTab> {
               },
             );
           },
-          child: Consumer<MessageProvider>(
-            builder: (context, value, child) {
-              return ListView.builder(
-                itemCount: value.listConversation.length,
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () => pushScreen(
-                        context,
-                        RoomChatScreen(
-                          id_nguoinhan: value.listConversation[index]
-                              ['id_nguoidung'],
-                          data_nguoinhan: value.listConversation[index],
-                        )),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 28,
-                                    backgroundImage: NetworkImage(value
-                                        .listConversation[index]['url_avatar']),
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text(
-                                    value.listConversation[index]['ten'],
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                              // const Text(
-                              //   '30 phút trước',
-                              //   style: TextStyle(fontSize: 12),
-                              // ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          const Divider(),
-                        ],
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Consumer<MessageProvider>(
+              builder: (context, value, child) {
+                return ListView.builder(
+                  itemCount: value.listConversation.length,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    return InkWell(
+                      onTap: () => pushScreen(
+                          context,
+                          RoomChatScreen(
+                            id_nguoinhan: value.listConversation[index]
+                                ['id_nguoidung'],
+                            data_nguoinhan: value.listConversation[index],
+                          )),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 28,
+                                      backgroundImage: NetworkImage(
+                                          value.listConversation[index]
+                                              ['url_avatar']),
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      value.listConversation[index]['ten'],
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                                // const Text(
+                                //   '30 phút trước',
+                                //   style: TextStyle(fontSize: 12),
+                                // ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            const Divider(),
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
-              );
-            },
+                    );
+                  },
+                );
+              },
+            ),
           ),
         ),
       ),
