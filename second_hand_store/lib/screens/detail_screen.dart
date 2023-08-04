@@ -357,7 +357,6 @@ void _showBottomSheet(BuildContext context, SanPham sanphams) {
               title: 'Xóa sản phẩm',
               function: () {
                 // pop(context); // Khong được đóng màn ở đây, nếu đóng sẽ lỗi vì không còn context
-
                 dialogModalBottomsheet(context, 'Xóa', () async {
                   final provider =
                       Provider.of<GoogleSignInProvider>(context, listen: false);

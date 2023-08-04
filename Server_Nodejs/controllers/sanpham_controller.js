@@ -213,11 +213,11 @@ const insertData = async (req, res) => {
                 sdt: req.body.sdt,
                 diachi: req.body.diachi,
                 status: false
-            }).then((sp) => {
+            }).then(async (sp) => {
                 if (sp) {
                     for (let i = 0; i < req.body.imageArr.length; i++) {
-                        Image.create({ url: req.body.imageArr[i], id_sanpham: sp['dataValues'].id_sanpham }).then((img) => {
-                            // console.log('IMG', img)
+                        await Image.create({ url: req.body.imageArr[i], id_sanpham: sp['dataValues'].id_sanpham }).then((img) => {
+                            console.log('IMG upload server: ', img)
                         })
                     }
                     res.json({ status: true, message: "insert succsess" })
@@ -249,10 +249,10 @@ const updateData = async (req, res) => {
                 diachi: req.body.diachi,
                 // status: false
             },
-                { where: { id_sanpham: req.body.id_sanpham } }).then((sp) => {
+                { where: { id_sanpham: req.body.id_sanpham } }).then(async (sp) => {
                     if (sp) {
                         for (let i = 0; i < req.body.imageArr.length; i++) {
-                            Image.update({ url: req.body.imageArr[i] }, { where: { id_sanpham: req.body.id_sanpham } }).then((img) => {
+                            await Image.update({ url: req.body.imageArr[i] }, { where: { id_sanpham: req.body.id_sanpham } }).then((img) => {
                                 console.log('UPDATE IMG ', img)
                             })
                         }

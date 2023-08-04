@@ -250,6 +250,10 @@ class _AddProductState extends State<AddProduct> {
                                             () {
                                               listImageFromDetail
                                                   .removeAt(index);
+                                              for (var element
+                                                  in listImageFromDetail) {
+                                                log("Arr Image: remove $element");
+                                              }
                                             },
                                           );
                                         },
@@ -692,8 +696,14 @@ class _AddProductState extends State<AddProduct> {
                             if (selectedImages.isNotEmpty) {
                               // ignore: use_build_context_synchronously
                               url = await uploadImages(selectedImages, context);
+                              for (var element in url) {
+                                log("Url Uploads: $element");
+                              }
                             } else {
                               url = listImageFromDetail;
+                              for (var element in url) {
+                                log("Url Image: $element");
+                              }
                             }
                             if (url.isNotEmpty) {
                               var sanPham = SanPham(
