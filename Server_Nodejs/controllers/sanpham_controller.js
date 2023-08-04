@@ -251,11 +251,16 @@ const updateData = async (req, res) => {
             },
                 { where: { id_sanpham: req.body.id_sanpham } }).then(async (sp) => {
                     if (sp) {
+                        // Lấy danh sách các bản ghi hình ảnh có id_sanpham 
+                        const imagesToUpdate = await Image.findAll({ where: { id_sanpham: req.body.id_sanpham } });
                         for (let i = 0; i < req.body.imageArr.length; i++) {
-                            await Image.update({ url: req.body.imageArr[i] }, { where: { id_sanpham: req.body.id_sanpham } }).then((img) => {
-                                console.log('UPDATE IMG ', img)
-                            })
+                            await imagesToUpdate[i].update({ url: req.body.imageArr[i] });
                         }
+                        // for (let i = 0; i < req.body.imageArr.length; i++) {
+                        //     await Image.update({ url: req.body.imageArr[i] }, { where: { id_sanpham: req.body.id_sanpham } }).then((img) => {
+                        //         console.log('UPDATE IMG ', img)
+                        //     })
+                        // }
                         res.json({ status: true, message: "Update succsess" })
                     } else {
                         res.status(404).json({ status: false, message: "Update false" })
