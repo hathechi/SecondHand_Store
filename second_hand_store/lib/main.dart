@@ -14,6 +14,7 @@ import 'package:second_hand_store/provider/product_provider.dart';
 import 'package:second_hand_store/screens/splash_screen.dart';
 import 'firebase_options.dart';
 
+//test
 Future<void> main() async {
   //config firebase in main
   WidgetsFlutterBinding.ensureInitialized();
