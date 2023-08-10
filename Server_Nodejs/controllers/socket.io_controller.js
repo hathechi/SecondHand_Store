@@ -49,7 +49,7 @@ async function saveConversationToDatabase(userId1, userId2) {
 
         //     }
         // })
-        const isExist = await Conversation.query(query);
+        const isExist = await sequelize.query(query);
 
 
         console.log(isExist)
