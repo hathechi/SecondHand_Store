@@ -33,7 +33,7 @@ async function saveConversationToDatabase(userId1, userId2) {
     try {
         const query = `SELECT * FROM conversation
          WHERE (userId1 = ${userId1} AND userId2 = ${userId2})
-            OR (userId1 = ${userId2} AND userId2 =${userId1});`
+            OR (userId1 = ${userId2} AND userId2 =${userId1})`
         // const isExist = await Conversation.findAll({
         //     where: {
         //         [Sequelize.Op.or]: [
