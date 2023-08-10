@@ -50,6 +50,7 @@ async function saveConversationToDatabase(userId1, userId2) {
         //     }
         // })
         const isExist = await sequelize.query(query);
+        //sửa lỗi rồi đây
 
 
         console.log(isExist)
