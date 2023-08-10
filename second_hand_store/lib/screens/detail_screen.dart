@@ -242,16 +242,18 @@ class _DetailScreenState extends State<DetailScreen> {
                         onPressed: () async {
                           var userId = await getFromLocalStorage('user');
                           // ignore: use_build_context_synchronously
-                          SocketService.saveConversationToDatabase(
-                              nguoigui: userId['id_nguoidung'],
-                              nguoinhan: widget.sanphams.idNguoidung!);
-                          // ignore: use_build_context_synchronously
-                          pushScreen(
-                            context,
-                            RoomChatScreen(
-                                id_nguoinhan: widget.sanphams.idNguoidung!,
-                                ten_nguoinhan: widget.sanphams.nguoidung!),
-                          );
+                          if (userId != null) {
+                            SocketService.saveConversationToDatabase(
+                                nguoigui: userId['id_nguoidung'],
+                                nguoinhan: widget.sanphams.idNguoidung!);
+                            // ignore: use_build_context_synchronously
+                            pushScreen(
+                              context,
+                              RoomChatScreen(
+                                  id_nguoinhan: widget.sanphams.idNguoidung!,
+                                  ten_nguoinhan: widget.sanphams.nguoidung!),
+                            );
+                          }
                         },
                         icon: const Icon(
                           CupertinoIcons.captions_bubble,
